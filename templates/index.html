@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ThriveTrack</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Daily Burnout Check</h1>
+        <form id="checklistForm">
+            <div class="checkbox-group">
+                <div class="checkbox-item">
+                    <input type="checkbox" name="tired" value="yes" id="tired">
+                    <label for="tired">Feeling tired</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" name="unmotivated" value="yes" id="unmotivated">
+                    <label for="unmotivated">Feeling unmotivated</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" name="overwhelmed" value="yes" id="overwhelmed">
+                    <label for="overwhelmed">Feeling overwhelmed</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" name="disconnected" value="yes" id="disconnected">
+                    <label for="disconnected">Feeling disconnected</label>
+                </div>
+            </div>
+            <button type="submit">Submit</button>
+        </form>
+        <p id="result"></p>
+    </div>
+
+    <script>
+        const form = document.getElementById('checklistForm');
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const result = document.getElementById('result');
+        
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Add loading state
+            submitBtn.classList.add('loading');
+            submitBtn.textContent = 'Analyzing...';
+            
+            const formData = new FormData(form);
+            const data = {};
+            formData.forEach((value, key) => data[key] = value);
+            
+            try {
+                const res = await fetch('/submit', {
+                    method: 'POST',
+                    body: new URLSearchParams(data)
+                });
+                const json = await res.json();
+                
+                // Remove loading state
+                submitBtn.classList.remove('loading');
+                submitBtn.textContent = 'Submit';
+                
+                // Show result with animation
+                result.textContent = "Burnout score: " + json.burnout_score;
+                result.classList.add('show');
+                
+                // Add pulse animation for high scores
+                if (json.burnout_score > 7) {
+                    result.classList.add('pulse');
+                }
+                
+            } catch (error) {
+                submitBtn.classList.remove('loading');
+                submitBtn.textContent = 'Submit';
+                result.textContent = "Error: Please try again";
+                result.classList.add('show');
+            }
+        });
+        
+        // Add interactive feedback for checkboxes
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const checkboxItem = this.closest('.checkbox-item');
+                if (this.checked) {
+                    checkboxItem.style.transform = 'translateX(10px)';
+                } else {
+                    checkboxItem.style.transform = 'translateX(0)';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
