@@ -19,6 +19,7 @@
       --green-50:#ecfdf5; --green-600:#059669;
       --cyan-50:#e6fafe; --cyan-600:#0891b2;
       --amber-50:#fff7ed; --amber-600:#d97706;
+      --rose-50:#fef2f2; --rose-600:#dc2626;
     }
     * { box-sizing: border-box; }
     html, body { height: 100%; }
@@ -123,6 +124,15 @@
     .dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
 
     .footer-note { font-size: 12px; color: var(--muted); }
+
+    /* New: Insights grids and badges */
+    .insights-2 { grid-template-columns: 1fr; }
+    @media (min-width: 1024px) { .insights-2 { grid-template-columns: 1fr 1fr; } }
+
+    .badge { font-size: 12px; padding: 4px 8px; border-radius: 999px; border: 1px solid var(--line); }
+    .risk-high { background: var(--rose-50); color: #991b1b; border-color: #fecaca; }
+    .risk-medium { background: var(--amber-50); color: #7c2d12; border-color: #fed7aa; }
+    .risk-low { background: var(--green-50); color: #065f46; border-color: #bbf7d0; }
   </style>
 </head>
 <body>
@@ -165,7 +175,7 @@
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 5-3 7h18c0-2-3 0-3-7"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
             </button>
             <button class="iconbtn" title="Settings">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 8 19.4a1.65 1.65 0 0 0-1.82.33l-.06-.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 3.6 15a1.65 1.65 0 0 0-1.51-1H2a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 3.6 8a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 8 3.6a1.65 1.65 0 0 0 1-1.51V2a2 2 0 1 1 4 0v.09A1.65 1.65 0 0 0 15 3.6a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l.06.06A1.65 1.65 0 0 0 20.4 8c.36.61.57 1.32.6 2.05V10a2 2 0 1 1 0 4h-.09c-.03.73-.24 1.44-.51 2.05z"/></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 8 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 3.6 15a1.65 1.65 0 0 0-1.51-1H2a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 3.6 8a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 8 3.6a1.65 1.65 0 0 0 1-1.51V2a2 2 0 1 1 4 0v.09A1.65 1.65 0 0 0 15 3.6a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l.06.06A1.65 1.65 0 0 0 20.4 8c.36.61.57 1.32.6 2.05V10a2 2 0 1 1 0 4h-.09c-.03.73-.24 1.44-.51 2.05z"/></svg>
             </button>
           </div>
         </div>
@@ -206,38 +216,31 @@
       <!-- Middle Row -->
       <section class="grid middle" style="margin-top:16px">
         <div class="card">
-          <div class="row" style="margin-bottom:8px"><h3>No of users</h3><button class="iconbtn" aria-label="more">⋮</button></div>
-          <div class="row" style="align-items:flex-end; gap:12px">
-            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-3-3.87"/><path d="M4 21v-2a4 4 0 0 1 3-3.87"/><circle cx="12" cy="7" r="4"/></svg>
-            <div>
-              <div style="font-size:32px; font-weight:700">583 K</div>
-              <div class="muted" style="font-size:12px">Total Customers</div>
-            </div>
-          </div>
+          <div class="row" style="margin-bottom:8px"><h3>Stress Factors Breakdown</h3><button class="iconbtn" aria-label="more">⋮</button></div>
+          <div class="chart-wrap"><canvas id="stressBar"></canvas></div>
         </div>
 
         <div class="card">
-          <div class="row" style="margin-bottom:8px"><h3>Inventory Values</h3><button class="iconbtn" aria-label="more">⋮</button></div>
-          <div class="row" style="gap:16px; align-items:center; flex-wrap:wrap">
-            <div class="chart-wrap"><canvas id="pieChart"></canvas></div>
-            <div style="min-width:200px">
-              <div class="row" style="gap:10px; margin-bottom:8px"><span class="dot" style="background:#2c6d62"></span><span class="muted">Sold units</span><strong style="margin-left:auto">32%</strong></div>
-              <div class="row" style="gap:10px"><span class="dot" style="background:#b7d7d2"></span><span class="muted">Total units</span><strong style="margin-left:auto">68%</strong></div>
-            </div>
-          </div>
+          <div class="row" style="margin-bottom:8px"><h3>Anonymous Team Sentiment</h3><span class="footer-note">Aggregated and privacy-safe</span></div>
+          <div class="chart-wrap"><canvas id="sentimentChart"></canvas></div>
+          <div class="row" style="margin-top:8px"><span class="muted">Overall Score</span><strong id="sentimentScore" style="margin-left:auto">-</strong></div>
         </div>
 
         <div class="card">
-          <div class="row" style="margin-bottom:8px"><h3>Top 10 Stores by sales</h3><button class="iconbtn" aria-label="more">⋮</button></div>
-          <div id="stores" style="display:grid; gap:12px"></div>
+          <div class="row" style="margin-bottom:8px"><h3>Burnout Risk Alerts</h3><span class="footer-note">Early indicators</span></div>
+          <div id="burnoutList" style="display:grid; gap:12px"></div>
         </div>
       </section>
 
-      <!-- Expense vs Profit -->
+      <!-- Well-being Trends (Main) -->
       <section class="card" style="margin-top:16px">
-        <div class="row" style="margin-bottom:6px"><h3>Expense vs Profit</h3><span class="footer-note">Last 6 months</span></div>
-        <div class="chart-wrap"><canvas id="lineChart"></canvas></div>
+        <div class="row" style="margin-bottom:6px"><h3>Well-being Trends</h3><span class="footer-note">Productivity vs Well-being</span></div>
+        <div class="chart-wrap"><canvas id="wellbeingChart"></canvas></div>
       </section>
+
+
+
+
 
     </main>
   </div>
@@ -254,72 +257,111 @@
       { m: "Jun", expense: 28, profit: 34 }
     ];
 
-    const pieCtx = document.getElementById('pieChart');
-    new Chart(pieCtx, {
-      type: 'doughnut',
-      data: {
-        labels: ['Sold units', 'Total units'],
-        datasets: [{
-          data: [32, 68],
-          backgroundColor: ['#2c6d62', '#b7d7d2'],
-          borderWidth: 0,
-        }]
-      },
-      options: {
-        plugins: { legend: { display: false } },
-        cutout: '65%'
-      }
+
+
+    // ----- Burnout Risk Alerts (Top-right card) -----
+    const burnoutAlertsMain = [
+      { name: 'Alex Johnson', risk: 'High', pct: 82 },
+      { name: 'Priya Patel', risk: 'Medium', pct: 58 },
+      { name: 'Diego Ramirez', risk: 'Medium', pct: 47 },
+      { name: 'Mia Chen', risk: 'Low', pct: 22 },
+      { name: 'Liam O\'Connor', risk: 'Low', pct: 18 }
+    ];
+
+    const container = document.getElementById('burnoutList');
+    burnoutAlertsMain.forEach(({name, risk, pct}) => {
+      const riskColor = risk === 'High' ? '#dc2626' : risk === 'Medium' ? '#d97706' : '#059669';
+      const riskClass = risk === 'High' ? 'risk-high' : risk === 'Medium' ? 'risk-medium' : 'risk-low';
+      const row = document.createElement('div');
+      row.innerHTML = `
+        <div class="row" style="font-size:14px">
+          <span style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">${name}</span>
+          <span class="badge ${riskClass}">${risk} risk</span>
+          <strong style="min-width:44px; text-align:right">${pct}%</strong>
+        </div>
+        <div class="progress"><span style="width:${pct}%; background:${riskColor}"></span></div>
+      `;
+      container.appendChild(row);
     });
 
-    const lineCtx = document.getElementById('lineChart');
-    new Chart(lineCtx, {
+    // ----- New: Well-being Trends (Productivity vs Well-being) -----
+    const wellbeingCtx = document.getElementById('wellbeingChart');
+    const wellbeingData = [
+      { m: 'Dec', prod: 62, wb: 68 },
+      { m: 'Jan', prod: 58, wb: 65 },
+      { m: 'Feb', prod: 64, wb: 66 },
+      { m: 'Mar', prod: 70, wb: 69 },
+      { m: 'Apr', prod: 75, wb: 72 },
+      { m: 'May', prod: 78, wb: 74 },
+      { m: 'Jun', prod: 82, wb: 76 }
+    ];
+
+    new Chart(wellbeingCtx, {
       type: 'line',
       data: {
-        labels: expenseProfit.map(d => d.m),
-        labels: expenseProfit.map(d => d.m),
+        labels: wellbeingData.map(d => d.m),
         datasets: [
-          { label: 'Expense', data: expenseProfit.map(d => d.expense), tension: .35, fill: true },
-          { label: 'Profit', data: expenseProfit.map(d => d.profit), tension: .35, fill: true },
+          { label: 'Productivity', data: wellbeingData.map(d => d.prod), borderColor: '#0891b2', backgroundColor: 'rgba(8,145,178,0.12)', tension: .35, fill: true },
+          { label: 'Well-being', data: wellbeingData.map(d => d.wb), borderColor: '#059669', backgroundColor: 'rgba(5,150,105,0.12)', tension: .35, fill: true },
         ]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
         scales: {
-          y: { grid: { color: '#eef2f7' } },
+          y: { beginAtZero: true, max: 100, grid: { color: '#eef2f7' } },
           x: { grid: { display: false } }
         },
         plugins: { legend: { position: 'bottom' } }
       }
     });
 
-    // ----- Top stores list -----
-    const topStores = [
-      ["Gateway st", 674],
-      ["The Rustic Fox", 621],
-      ["Velvet Vine", 598],
-      ["Blue Harbor", 596],
-      ["Nebula Novelties", 395],
-      ["Crimson Crafters", 344],
-      ["Tidal Treasures", 274],
-      ["Whimsy Wild", 213],
-      ["Mercantile", 183],
-      ["Emporium", 176]
-    ];
 
-    const max = Math.max(...topStores.map(s => s[1]));
-    const container = document.getElementById('stores');
-    topStores.forEach(([name, val]) => {
-      const row = document.createElement('div');
-      row.innerHTML = `
-        <div class="row" style="font-size:14px">
-          <span style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">${name}</span>
-          <span class="muted">${val}k</span>
-        </div>
-        <div class="progress"><span style="width:${(val/max)*100}%"></span></div>
-      `;
-      container.appendChild(row);
+    // ----- New: Stress Factors Breakdown (Horizontal Bar) -----
+    const stressCtx = document.getElementById('stressBar');
+    new Chart(stressCtx, {
+      type: 'bar',
+      data: {
+        labels: ['Workload spikes', 'Excessive overtime', 'Frequent task switching', 'Meeting overload', 'After-hours messages'],
+        datasets: [{
+          label: 'Impact score',
+          data: [68, 52, 44, 36, 28],
+          backgroundColor: '#94a3b8',
+          borderRadius: 6,
+          barThickness: 16
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: { beginAtZero: true, max: 100, grid: { color: '#eef2f7' } },
+          y: { grid: { display: false } }
+        },
+        plugins: { legend: { display: false } }
+      }
     });
+
+    // ----- Anonymous Team Sentiment (now in middle row) -----
+    const sentimentScore = 78; // 0-100
+    const sentimentCtx = document.getElementById('sentimentChart');
+    new Chart(sentimentCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Score', 'Remainder'],
+        datasets: [{
+          data: [sentimentScore, 100 - sentimentScore],
+          backgroundColor: ['#059669', '#e5e7eb'],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        cutout: '70%',
+        plugins: { legend: { display: false } }
+      }
+    });
+    document.getElementById('sentimentScore').textContent = `${sentimentScore} / 100`;
   </script>
 </body>
 </html>
