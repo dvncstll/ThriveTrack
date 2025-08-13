@@ -1,92 +1,325 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>ThriveTrack</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inventory Admin Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg: #f4f7f8;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --line: #e5e7eb;
+      --teal-50:#e6fbf7; --teal-200:#b7d7d2; --teal-600:#2c6d62;
+      --green-50:#ecfdf5; --green-600:#059669;
+      --cyan-50:#e6fafe; --cyan-600:#0891b2;
+      --amber-50:#fff7ed; --amber-600:#d97706;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+    }
+    .shell {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 960px) {
+      .shell { grid-template-columns: 260px minmax(0,1fr); }
+    }
+
+    /* Sidebar */
+    .sidebar {
+      display: none;
+    }
+    @media (min-width: 960px) {
+      .sidebar {
+        display: flex;
+        position: sticky; top: 0; height: 100vh;
+        flex-direction: column; gap: 14px;
+        background: var(--card);
+        border-right: 1px solid var(--line);
+        padding: 16px;
+      }
+    }
+    .profile {
+      display: flex; gap: 12px; align-items: center;
+      background: #f8fafc; border-radius: 16px; padding: 12px;
+    }
+    .avatar { width: 40px; height: 40px; border-radius: 999px; background: linear-gradient(135deg,#14b8a6,#0f766e); }
+    .muted { color: var(--muted); }
+    .nav button {
+      width: 100%; text-align: left;
+      padding: 10px 12px; border: 0; background: transparent; cursor: pointer;
+      border-radius: 12px; color: #0f172a; font-size: 14px;
+    }
+    .nav button:hover { background: #f8fafc; }
+    .nav button.active { background: #eef2f7; font-weight: 600; }
+    .logout {
+      margin-top: auto; width: 100%; border: 1px solid var(--line); background: #fff;
+      padding: 10px 12px; border-radius: 12px; cursor: pointer;
+    }
+
+    /* Main */
+    main { padding: 16px; }
+    @media (min-width: 960px) { main { padding: 32px; } }
+
+    .topbar { display: grid; gap: 12px; }
+    @media (min-width: 960px) {
+      .topbar { grid-template-columns: 1fr auto; align-items: center; }
+    }
+    h1 { margin: 0; font-size: 24px; }
+    .searchbar { position: relative; }
+    .searchbar input {
+      width: min(560px, 100%);
+      padding: 10px 12px 10px 36px; border-radius: 16px;
+      border: 1px solid var(--line); background: var(--card);
+      outline: none; font-size: 14px; box-shadow: 0 1px 2px rgba(0,0,0,.04);
+    }
+    .icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); opacity:.5 }
+    .toolbar { display: flex; gap: 8px; }
+    .iconbtn { border: 1px solid var(--line); background: var(--card); padding: 8px; border-radius: 12px; cursor: pointer; }
+
+    /* Cards */
+    .grid { display: grid; gap: 16px; }
+    .grid.cols-4 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+    @media (min-width: 640px) { .grid.cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (min-width: 1024px) { .grid.cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
+    .stat {
+      border: 1px solid var(--line); border-radius: 16px; padding: 14px; box-shadow: 0 1px 2px rgba(0,0,0,.04);
+      display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 10px;
+    }
+    .tone-teal { background: var(--teal-50); color: #0b3b35; }
+    .tone-green { background: var(--green-50); color: #064e3b; }
+    .tone-cyan { background: var(--cyan-50); color: #083344; }
+    .tone-amber { background: var(--amber-50); color: #7c2d12; }
+    .stat .value { font-size: 24px; font-weight: 700; text-align: right; }
+    .stat .label { font-size: 12px; opacity: .7; text-align: right; }
+
+    .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
+    .card h3 { margin: 0 0 10px; font-size: 14px; font-weight: 600; }
+
+    .middle { grid-template-columns: 1fr; }
+    @media (min-width: 1024px) { .middle { grid-template-columns: 1fr 1fr 1.2fr; } }
+
+    .row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+
+    .progress { height: 8px; width: 100%; background: #f1f5f9; border-radius: 999px; overflow: hidden; }
+    .progress > span { display: block; height: 100%; background: #94a3b8; }
+
+    .chart-wrap { height: 260px; }
+    .chart-legend { display: flex; gap: 16px; align-items: center; font-size: 12px; color: var(--muted); }
+    .dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+
+    .footer-note { font-size: 12px; color: var(--muted); }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Daily Burnout Check</h1>
-        <form id="checklistForm">
-            <div class="checkbox-group">
-                <div class="checkbox-item">
-                    <input type="checkbox" name="tired" value="yes" id="tired">
-                    <label for="tired">Feeling tired</label>
-                </div>
-                <div class="checkbox-item">
-                    <input type="checkbox" name="unmotivated" value="yes" id="unmotivated">
-                    <label for="unmotivated">Feeling unmotivated</label>
-                </div>
-                <div class="checkbox-item">
-                    <input type="checkbox" name="overwhelmed" value="yes" id="overwhelmed">
-                    <label for="overwhelmed">Feeling overwhelmed</label>
-                </div>
-                <div class="checkbox-item">
-                    <input type="checkbox" name="disconnected" value="yes" id="disconnected">
-                    <label for="disconnected">Feeling disconnected</label>
-                </div>
-            </div>
-            <button type="submit">Submit</button>
-        </form>
-        <p id="result"></p>
-    </div>
+  <div class="shell">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="profile">
+        <div class="avatar"></div>
+        <div>
+          <div style="font-weight:600">Nirmal Kumar P</div>
+          <div class="muted" style="font-size:12px">nirmalcom.job@gmail.com</div>
+        </div>
+      </div>
 
-    <script>
-        const form = document.getElementById('checklistForm');
-        const submitBtn = form.querySelector('button[type="submit"]');
-        const result = document.getElementById('result');
-        
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            // Add loading state
-            submitBtn.classList.add('loading');
-            submitBtn.textContent = 'Analyzing...';
-            
-            const formData = new FormData(form);
-            const data = {};
-            formData.forEach((value, key) => data[key] = value);
-            
-            try {
-                const res = await fetch('/submit', {
-                    method: 'POST',
-                    body: new URLSearchParams(data)
-                });
-                const json = await res.json();
-                
-                // Remove loading state
-                submitBtn.classList.remove('loading');
-                submitBtn.textContent = 'Submit';
-                
-                // Show result with animation
-                result.textContent = "Burnout score: " + json.burnout_score;
-                result.classList.add('show');
-                
-                // Add pulse animation for high scores
-                if (json.burnout_score > 7) {
-                    result.classList.add('pulse');
-                }
-                
-            } catch (error) {
-                submitBtn.classList.remove('loading');
-                submitBtn.textContent = 'Submit';
-                result.textContent = "Error: Please try again";
-                result.classList.add('show');
-            }
-        });
-        
-        // Add interactive feedback for checkboxes
-        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-        checkboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                const checkboxItem = this.closest('.checkbox-item');
-                if (this.checked) {
-                    checkboxItem.style.transform = 'translateX(10px)';
-                } else {
-                    checkboxItem.style.transform = 'translateX(0)';
-                }
-            });
-        });
-    </script>
+      <nav class="nav">
+        <button class="active">Dashboard</button>
+        <button>Inventory</button>
+        <button>Orders</button>
+        <button>Purchase</button>
+        <button>Reporting</button>
+        <button>Support</button>
+        <button>Settings</button>
+      </nav>
+
+      <button class="logout">Logout</button>
+    </aside>
+
+    <!-- Main -->
+    <main>
+      <!-- Top bar -->
+      <div class="topbar">
+        <h1>Welcome Nirmal!</h1>
+        <div class="row">
+          <div class="searchbar">
+            <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" placeholder="Search" />
+          </div>
+          <div class="toolbar">
+            <button class="iconbtn" title="Notifications">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 5-3 7h18c0-2-3 0-3-7"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            </button>
+            <button class="iconbtn" title="Settings">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 8 19.4a1.65 1.65 0 0 0-1.82.33l-.06-.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 3.6 15a1.65 1.65 0 0 0-1.51-1H2a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 3.6 8a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 8 3.6a1.65 1.65 0 0 0 1-1.51V2a2 2 0 1 1 4 0v.09A1.65 1.65 0 0 0 15 3.6a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l.06.06A1.65 1.65 0 0 0 20.4 8c.36.61.57 1.32.6 2.05V10a2 2 0 1 1 0 4h-.09c-.03.73-.24 1.44-.51 2.05z"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Overview cards -->
+      <section class="grid cols-4" style="margin-top:16px">
+        <div class="stat tone-teal">
+          <div style="background:#fff; padding:8px; border-radius:12px; box-shadow:0 1px 2px rgba(0,0,0,.06);">📦</div>
+          <div>
+            <div class="value">5,483</div>
+            <div class="label">Total Products</div>
+          </div>
+        </div>
+        <div class="stat tone-green">
+          <div style="background:#fff; padding:8px; border-radius:12px; box-shadow:0 1px 2px rgba(0,0,0,.06);">🛒</div>
+          <div>
+            <div class="value">2,859</div>
+            <div class="label">Orders</div>
+          </div>
+        </div>
+        <div class="stat tone-cyan">
+          <div style="background:#fff; padding:8px; border-radius:12px; box-shadow:0 1px 2px rgba(0,0,0,.06);">📚</div>
+          <div>
+            <div class="value">5,483</div>
+            <div class="label">Total Stock</div>
+          </div>
+        </div>
+        <div class="stat tone-amber">
+          <div style="background:#fff; padding:8px; border-radius:12px; box-shadow:0 1px 2px rgba(0,0,0,.06);">⚠️</div>
+          <div>
+            <div class="value">38</div>
+            <div class="label">Out of Stock</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Middle Row -->
+      <section class="grid middle" style="margin-top:16px">
+        <div class="card">
+          <div class="row" style="margin-bottom:8px"><h3>No of users</h3><button class="iconbtn" aria-label="more">⋮</button></div>
+          <div class="row" style="align-items:flex-end; gap:12px">
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-3-3.87"/><path d="M4 21v-2a4 4 0 0 1 3-3.87"/><circle cx="12" cy="7" r="4"/></svg>
+            <div>
+              <div style="font-size:32px; font-weight:700">583 K</div>
+              <div class="muted" style="font-size:12px">Total Customers</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="row" style="margin-bottom:8px"><h3>Inventory Values</h3><button class="iconbtn" aria-label="more">⋮</button></div>
+          <div class="row" style="gap:16px; align-items:center; flex-wrap:wrap">
+            <div class="chart-wrap"><canvas id="pieChart"></canvas></div>
+            <div style="min-width:200px">
+              <div class="row" style="gap:10px; margin-bottom:8px"><span class="dot" style="background:#2c6d62"></span><span class="muted">Sold units</span><strong style="margin-left:auto">32%</strong></div>
+              <div class="row" style="gap:10px"><span class="dot" style="background:#b7d7d2"></span><span class="muted">Total units</span><strong style="margin-left:auto">68%</strong></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="row" style="margin-bottom:8px"><h3>Top 10 Stores by sales</h3><button class="iconbtn" aria-label="more">⋮</button></div>
+          <div id="stores" style="display:grid; gap:12px"></div>
+        </div>
+      </section>
+
+      <!-- Expense vs Profit -->
+      <section class="card" style="margin-top:16px">
+        <div class="row" style="margin-bottom:6px"><h3>Expense vs Profit</h3><span class="footer-note">Last 6 months</span></div>
+        <div class="chart-wrap"><canvas id="lineChart"></canvas></div>
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    // ----- Charts -----
+    const expenseProfit = [
+      { m: "Dec", expense: 18, profit: 8 },
+      { m: "Jan", expense: 14, profit: 10 },
+      { m: "Feb", expense: 22, profit: 12 },
+      { m: "Mar", expense: 20, profit: 18 },
+      { m: "Apr", expense: 24, profit: 22 },
+      { m: "May", expense: 30, profit: 26 },
+      { m: "Jun", expense: 28, profit: 34 }
+    ];
+
+    const pieCtx = document.getElementById('pieChart');
+    new Chart(pieCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Sold units', 'Total units'],
+        datasets: [{
+          data: [32, 68],
+          backgroundColor: ['#2c6d62', '#b7d7d2'],
+          borderWidth: 0,
+        }]
+      },
+      options: {
+        plugins: { legend: { display: false } },
+        cutout: '65%'
+      }
+    });
+
+    const lineCtx = document.getElementById('lineChart');
+    new Chart(lineCtx, {
+      type: 'line',
+      data: {
+        labels: expenseProfit.map(d => d.m),
+        labels: expenseProfit.map(d => d.m),
+        datasets: [
+          { label: 'Expense', data: expenseProfit.map(d => d.expense), tension: .35, fill: true },
+          { label: 'Profit', data: expenseProfit.map(d => d.profit), tension: .35, fill: true },
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: { grid: { color: '#eef2f7' } },
+          x: { grid: { display: false } }
+        },
+        plugins: { legend: { position: 'bottom' } }
+      }
+    });
+
+    // ----- Top stores list -----
+    const topStores = [
+      ["Gateway st", 674],
+      ["The Rustic Fox", 621],
+      ["Velvet Vine", 598],
+      ["Blue Harbor", 596],
+      ["Nebula Novelties", 395],
+      ["Crimson Crafters", 344],
+      ["Tidal Treasures", 274],
+      ["Whimsy Wild", 213],
+      ["Mercantile", 183],
+      ["Emporium", 176]
+    ];
+
+    const max = Math.max(...topStores.map(s => s[1]));
+    const container = document.getElementById('stores');
+    topStores.forEach(([name, val]) => {
+      const row = document.createElement('div');
+      row.innerHTML = `
+        <div class="row" style="font-size:14px">
+          <span style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">${name}</span>
+          <span class="muted">${val}k</span>
+        </div>
+        <div class="progress"><span style="width:${(val/max)*100}%"></span></div>
+      `;
+      container.appendChild(row);
+    });
+  </script>
 </body>
 </html>
