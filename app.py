@@ -12,6 +12,18 @@ collection = db["responses"]
 def index():
     return render_template('index.html')
 
+@app.route('/employee-dashboard')
+def employee_dashboard():
+    return render_template('employee-dashboard.html')
+
+@app.route('/login')
+def login():
+    return render_template('login.html')
+
+@app.route('/redirect')
+def redirect_page():
+    return render_template('redirect.html')
+
 @app.route('/submit', methods=['POST'])
 def submit():
     data = request.form.to_dict()

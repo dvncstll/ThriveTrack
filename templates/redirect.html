@@ -59,11 +59,11 @@
             
             if (isLoggedIn === 'true' && userRole) {
                 // User is logged in, redirect to appropriate dashboard
-                if (userRole === 'hr') {
-                    window.location.href = 'index.html';
-                } else {
-                    window.location.href = 'employee-dashboard.html';
-                }
+                            if (userRole === 'hr') {
+                window.location.href = '/';
+            } else {
+                window.location.href = '/employee-dashboard';
+            }
             } else {
                 // User is not logged in (logout scenario), show logout message
                 const titleElement = document.querySelector('h2');
@@ -74,7 +74,7 @@
                 
                 // Redirect to login after showing logout message
                 setTimeout(() => {
-                    window.location.href = 'login.html';
+                    window.location.href = '/login';
                 }, 2000);
             }
         });
