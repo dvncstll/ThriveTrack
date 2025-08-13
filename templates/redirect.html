@@ -65,10 +65,17 @@
                     window.location.href = 'employee-dashboard.html';
                 }
             } else {
-                // User is not logged in, redirect to login
+                // User is not logged in (logout scenario), show logout message
+                const titleElement = document.querySelector('h2');
+                const messageElement = document.querySelector('p');
+                
+                titleElement.textContent = 'Logged Out Successfully';
+                messageElement.textContent = 'Redirecting to login...';
+                
+                // Redirect to login after showing logout message
                 setTimeout(() => {
                     window.location.href = 'login.html';
-                }, 1500);
+                }, 2000);
             }
         });
     </script>
