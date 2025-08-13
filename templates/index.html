@@ -133,6 +133,100 @@
     .risk-high { background: var(--rose-50); color: #991b1b; border-color: #fecaca; }
     .risk-medium { background: var(--amber-50); color: #7c2d12; border-color: #fed7aa; }
     .risk-low { background: var(--green-50); color: #065f46; border-color: #bbf7d0; }
+
+    /* New component styles */
+    .report-btn {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--line);
+      background: var(--card);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 14px;
+    }
+    .report-btn:hover {
+      background: #f8fafc;
+      border-color: var(--teal-200);
+    }
+    .format-badge {
+      background: var(--teal-50);
+      color: var(--teal-600);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+    .risk-factor {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      background: #f8fafc;
+      border-radius: 6px;
+      font-size: 13px;
+    }
+    .announcement-item {
+      padding: 12px;
+      background: #f8fafc;
+      border-radius: 8px;
+      border-left: 3px solid var(--teal-600);
+    }
+    .announcement-item.urgent {
+      border-left-color: var(--rose-600);
+      background: var(--rose-50);
+    }
+    .announcement-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+      font-size: 13px;
+    }
+    .announcement-meta {
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .download-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      background: #f8fafc;
+      border-radius: 6px;
+      font-size: 13px;
+    }
+
+    /* Spinner animation */
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Modal styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 24px;
+      border-radius: 12px;
+      max-width: 500px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
   </style>
 </head>
 <body>
@@ -142,8 +236,8 @@
       <div class="profile">
         <div class="avatar"></div>
         <div>
-          <div style="font-weight:600">Nirmal Kumar P</div>
-          <div class="muted" style="font-size:12px">nirmalcom.job@gmail.com</div>
+          <div style="font-weight:600" id="userName">Nirmal Kumar P</div>
+          <div class="muted" style="font-size:12px" id="userEmail">nirmalcom.job@gmail.com</div>
         </div>
       </div>
 
@@ -157,7 +251,7 @@
         <button>Settings</button>
       </nav>
 
-      <button class="logout">Logout</button>
+      <button class="logout" id="logoutBtn">Logout</button>
     </aside>
 
     <!-- Main -->
@@ -238,6 +332,220 @@
         <div class="chart-wrap"><canvas id="wellbeingChart"></canvas></div>
       </section>
 
+      <!-- Attrition Risk Prediction -->
+      <section class="card" style="margin-top:16px; border: 2px solid #ff0000;">
+        <div class="row" style="margin-bottom:16px">
+          <h3>Attrition Risk Prediction</h3>
+          <span class="footer-note">AI-powered early warning system</span>
+        </div>
+        <div class="grid insights-2" style="gap:20px">
+          <div>
+            <h4 style="margin:0 0 12px; font-size:13px; color:var(--muted)">Risk Factors Analysis</h4>
+            <div id="riskFactors" style="display:grid; gap:8px; min-height:100px; background:#f0f0f0; padding:10px; border-radius:8px;"></div>
+            <button id="addRiskFactor" style="margin-top:12px; background:var(--teal-600); color:white; border:0; padding:8px 16px; border-radius:6px; cursor:pointer; font-size:12px;">+ Add Risk Factor</button>
+          </div>
+          <div>
+            <h4 style="margin:0 0 12px; font-size:13px; color:var(--muted)">High Risk Employees</h4>
+            <div id="highRiskEmployees" style="display:grid; gap:8px; min-height:100px; background:#f0f0f0; padding:10px; border-radius:8px;"></div>
+            <button id="addEmployee" style="margin-top:12px; background:var(--rose-600); color:white; border:0; padding:8px 16px; border-radius:6px; cursor:pointer; font-size:12px;">+ Add Employee</button>
+          </div>
+        </div>
+        
+        <!-- Risk Assessment Form -->
+        <div id="riskAssessmentForm" style="display:none; margin-top:20px; padding:16px; background:#f8fafc; border-radius:8px; border:1px solid var(--line);">
+          <h4 style="margin:0 0 12px; font-size:14px;">Quick Risk Assessment</h4>
+          <div style="display:grid; gap:12px;">
+            <div>
+              <label style="font-size:12px; color:var(--muted); display:block; margin-bottom:4px;">Employee Name:</label>
+              <input type="text" id="employeeName" placeholder="Enter employee name" style="width:100%; padding:8px; border:1px solid var(--line); border-radius:6px; font-size:14px;">
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+              <div>
+                <label style="font-size:12px; color:var(--muted); display:block; margin-bottom:4px;">Workload Level:</label>
+                <select id="workloadLevel" style="width:100%; padding:8px; border:1px solid var(--line); border-radius:6px; font-size:14px;">
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                  <option value="critical">Critical</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size:12px; color:var(--muted); display:block; margin-bottom:4px;">Mood Score:</label>
+                <select id="moodScore" style="width:100%; padding:8px; border:1px solid var(--line); border-radius:6px; font-size:14px;">
+                  <option value="9">9-10 (Excellent)</option>
+                  <option value="7">7-8 (Good)</option>
+                  <option value="5">5-6 (Average)</option>
+                  <option value="3">3-4 (Poor)</option>
+                  <option value="1">1-2 (Very Poor)</option>
+                </select>
+              </div>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <button id="calculateRisk" style="background:var(--teal-600); color:white; border:0; padding:10px 20px; border-radius:6px; cursor:pointer; font-weight:500;">Calculate Risk</button>
+              <button id="cancelAssessment" style="background:var(--muted); color:white; border:0; padding:10px 20px; border-radius:6px; cursor:pointer;">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Downloadable Reports -->
+      <section class="card" style="margin-top:16px; border: 2px solid #00ff00;">
+        <div class="row" style="margin-bottom:16px">
+          <h3>Downloadable Reports</h3>
+          <span class="footer-note">Export data in multiple formats</span>
+        </div>
+        <div class="grid insights-2" style="gap:20px">
+          <div>
+            <h4 style="margin:0 0 12px; font-size:13px; color:var(--muted)">Report Types</h4>
+            <div style="display:grid; gap:8px">
+              <button class="report-btn" data-type="wellbeing" data-format="pdf">
+                <span>📊 Well-being Summary</span>
+                <span class="format-badge">PDF</span>
+              </button>
+              <button class="report-btn" data-type="productivity" data-format="csv">
+                <span>📈 Productivity Metrics</span>
+                <span class="format-badge">CSV</span>
+              </button>
+              <button class="report-btn" data-type="attrition" data-format="pdf">
+                <span>⚠️ Attrition Risk Report</span>
+                <span class="format-badge">PDF</span>
+              </button>
+              <button class="report-btn" data-type="team" data-format="csv">
+                <span>👥 Team Performance</span>
+                <span class="format-badge">CSV</span>
+              </button>
+            </div>
+            
+            <!-- Report Generation Progress -->
+            <div id="reportProgress" style="display:none; margin-top:16px; padding:12px; background:#f0f9ff; border-radius:8px; border:1px solid #0ea5e9;">
+              <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+                <div style="width:16px; height:16px; border:2px solid #0ea5e9; border-top:2px solid transparent; border-radius:50%; animation:spin 1s linear infinite;"></div>
+                <span style="font-size:13px; color:#0c4a6e;">Generating report...</span>
+              </div>
+              <div class="progress" style="height:6px;">
+                <span id="progressBar" style="width:0%; background:#0ea5e9; transition:width 0.3s;"></span>
+              </div>
+            </div>
+          </div>
+          <div>
+            <h4 style="margin:0 0 12px; font-size:13px; color:var(--muted)">Recent Downloads</h4>
+            <div id="recentDownloads" style="display:grid; gap:8px; min-height:100px; background:#f0f0f0; padding:10px; border-radius:8px;"></div>
+            <button id="clearDownloads" style="margin-top:12px; background:var(--muted); color:white; border:0; padding:8px 16px; border-radius:6px; cursor:pointer; font-size:12px;">Clear History</button>
+          </div>
+        </div>
+        
+        <!-- Report Customization -->
+        <div style="margin-top:20px; padding:16px; background:#f8fafc; border-radius:8px; border:1px solid var(--line);">
+          <h4 style="margin:0 0 12px; font-size:14px;">Report Customization</h4>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px;">
+            <div>
+              <label style="font-size:12px; color:var(--muted); display:block; margin-bottom:4px;">Date Range:</label>
+              <select id="dateRange" style="width:100%; padding:8px; border:1px solid var(--line); border-radius:6px; font-size:14px;">
+                <option value="7">Last 7 days</option>
+                <option value="30" selected>Last 30 days</option>
+                <option value="90">Last 90 days</option>
+                <option value="365">Last year</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:12px; color:var(--muted); display:block; margin-bottom:4px;">Include Charts:</label>
+              <label style="display:flex; align-items:center; gap:8px; font-size:14px;">
+                <input type="checkbox" id="includeCharts" checked style="margin:0;"> Yes
+              </label>
+            </div>
+            <div>
+              <label style="font-size:12px; color:var(--muted); display:block; margin-bottom:4px;">Report Theme:</label>
+              <select id="reportTheme" style="width:100%; padding:8px; border:1px solid var(--line); border-radius:6px; font-size:14px;">
+                <option value="default">Default</option>
+                <option value="dark">Dark</option>
+                <option value="minimal">Minimal</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Send Announcements -->
+      <section class="card" style="margin-top:16px; border: 2px solid #0000ff;">
+        <div class="row" style="margin-bottom:16px">
+          <h3>Send Announcements</h3>
+          <span class="footer-note">Communicate with your team</span>
+        </div>
+        <div class="grid insights-2" style="gap:20px">
+          <div>
+            <h4 style="margin:0 0 12px; font-size:13px; color:var(--muted)">New Announcement</h4>
+            <form id="announcementForm" style="display:grid; gap:12px">
+              <input type="text" id="announcementTitle" placeholder="Announcement title" style="padding:10px; border:1px solid var(--line); border-radius:8px; font-size:14px;">
+              <textarea id="announcementContent" placeholder="Enter your announcement message here..." rows="4" style="padding:10px; border:1px solid var(--line); border-radius:8px; font-size:14px; resize:vertical;"></textarea>
+              
+              <!-- Advanced Options -->
+              <div style="display:grid; gap:8px;">
+                <div style="display:flex; gap:8px; align-items:center">
+                  <label style="font-size:13px; color:var(--muted)">
+                    <input type="checkbox" id="urgentFlag" style="margin-right:6px;"> Mark as urgent
+                  </label>
+                  <label style="font-size:13px; color:var(--muted)">
+                    <input type="checkbox" id="scheduleFlag" style="margin-right:6px;"> Schedule for later
+                  </label>
+                </div>
+                
+                <div id="scheduleOptions" style="display:none; padding:12px; background:#f8fafc; border-radius:6px; border:1px solid var(--line);">
+                  <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                    <div>
+                      <label style="font-size:12px; color:var(--muted); display:block; margin-bottom:4px;">Date:</label>
+                      <input type="date" id="scheduleDate" style="width:100%; padding:6px; border:1px solid var(--line); border-radius:4px; font-size:12px;">
+                    </div>
+                    <div>
+                      <label style="font-size:12px; color:var(--muted); display:block; margin-bottom:4px;">Time:</label>
+                      <input type="time" id="scheduleTime" style="width:100%; padding:6px; border:1px solid var(--line); border-radius:4px; font-size:12px;">
+                    </div>
+                  </div>
+                </div>
+                
+                <div>
+                  <label style="font-size:12px; color:var(--muted); display:block; margin-bottom:4px;">Target Audience:</label>
+                  <select id="targetAudience" style="width:100%; padding:8px; border:1px solid var(--line); border-radius:6px; font-size:14px;">
+                    <option value="all">All Employees</option>
+                    <option value="managers">Managers Only</option>
+                    <option value="developers">Development Team</option>
+                    <option value="hr">HR Team</option>
+                    <option value="custom">Custom Selection</option>
+                  </select>
+                </div>
+              </div>
+              
+              <div style="display:flex; gap:8px; align-items:center">
+                <button type="submit" style="background:var(--teal-600); color:white; border:0; padding:10px 20px; border-radius:8px; cursor:pointer; font-weight:500;">Send Announcement</button>
+                <button type="button" id="previewBtn" style="background:var(--muted); color:white; border:0; padding:10px 20px; border-radius:8px; cursor:pointer;">Preview</button>
+              </div>
+            </form>
+          </div>
+          <div>
+            <h4 style="margin:0 0 12px; font-size:13px; color:var(--muted)">Recent Announcements</h4>
+            <div id="recentAnnouncements" style="display:grid; gap:8px; min-height:100px; background:#f0f0f0; padding:10px; border-radius:8px;"></div>
+            <div style="display:flex; gap:8px; margin-top:12px;">
+              <button id="filterUrgent" style="background:var(--rose-600); color:white; border:0; padding:8px 16px; border-radius:6px; cursor:pointer; font-size:12px;">Urgent Only</button>
+              <button id="showAll" style="background:var(--teal-600); color:white; border:0; padding:8px 16px; border-radius:6px; cursor:pointer; font-size:12px;">Show All</button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Announcement Preview Modal -->
+        <div id="previewModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); z-index:1000; display:flex; align-items:center; justify-content:center;">
+          <div style="background:white; padding:24px; border-radius:12px; max-width:500px; width:90%; max-height:80vh; overflow-y:auto;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+              <h3 style="margin:0;">Announcement Preview</h3>
+              <button id="closePreview" style="background:none; border:0; font-size:20px; cursor:pointer; color:var(--muted);">&times;</button>
+            </div>
+            <div id="previewContent" style="border:1px solid var(--line); border-radius:8px; padding:16px; background:#f8fafc;"></div>
+            <div style="display:flex; gap:8px; margin-top:16px; justify-content:flex-end;">
+              <button id="editPreview" style="background:var(--muted); color:white; border:0; padding:10px 20px; border-radius:6px; cursor:pointer;">Edit</button>
+              <button id="sendFromPreview" style="background:var(--teal-600); color:white; border:0; padding:10px 20px; border-radius:6px; cursor:pointer;">Send Now</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
 
 
 
@@ -246,6 +554,47 @@
   </div>
 
   <script>
+    // ===== AUTHENTICATION & SECURITY =====
+    
+    // Check if user is logged in and has HR role
+    function checkAuth() {
+      const isLoggedIn = localStorage.getItem('isLoggedIn');
+      const userRole = localStorage.getItem('userRole');
+      const userEmail = localStorage.getItem('userEmail');
+      
+      if (!isLoggedIn || userRole !== 'hr') {
+        // Redirect to login if not authenticated or not HR
+        window.location.href = 'login.html';
+        return false;
+      }
+      
+      // Update user info in the UI
+      if (userEmail) {
+        document.getElementById('userEmail').textContent = userEmail;
+        // Extract name from email for demo purposes
+        const name = userEmail.split('@')[0];
+        document.getElementById('userName').textContent = name.charAt(0).toUpperCase() + name.slice(1);
+      }
+      
+      return true;
+    }
+    
+    // Logout functionality
+    document.getElementById('logoutBtn').addEventListener('click', function() {
+      localStorage.removeItem('isLoggedIn');
+      localStorage.removeItem('userRole');
+      localStorage.removeItem('userEmail');
+      window.location.href = 'login.html';
+    });
+    
+    // Check authentication on page load
+    if (!checkAuth()) {
+      // Stop execution if not authenticated
+      throw new Error('Authentication failed');
+    }
+    
+    // ===== DASHBOARD FUNCTIONALITY =====
+
     // ----- Charts -----
     const expenseProfit = [
       { m: "Dec", expense: 18, profit: 8 },
@@ -256,8 +605,6 @@
       { m: "May", expense: 30, profit: 26 },
       { m: "Jun", expense: 28, profit: 34 }
     ];
-
-
 
     // ----- Burnout Risk Alerts (Top-right card) -----
     const burnoutAlertsMain = [
@@ -284,7 +631,7 @@
       container.appendChild(row);
     });
 
-    // ----- New: Well-being Trends (Productivity vs Well-being) -----
+    // ----- Well-being Trends (Productivity vs Well-being) -----
     const wellbeingCtx = document.getElementById('wellbeingChart');
     const wellbeingData = [
       { m: 'Dec', prod: 62, wb: 68 },
@@ -316,8 +663,7 @@
       }
     });
 
-
-    // ----- New: Stress Factors Breakdown (Horizontal Bar) -----
+    // ----- Stress Factors Breakdown (Horizontal Bar) -----
     const stressCtx = document.getElementById('stressBar');
     new Chart(stressCtx, {
       type: 'bar',
@@ -343,8 +689,8 @@
       }
     });
 
-    // ----- Anonymous Team Sentiment (now in middle row) -----
-    const sentimentScore = 78; // 0-100
+    // ----- Anonymous Team Sentiment -----
+    const sentimentScore = 78;
     const sentimentCtx = document.getElementById('sentimentChart');
     new Chart(sentimentCtx, {
       type: 'doughnut',
@@ -362,6 +708,413 @@
       }
     });
     document.getElementById('sentimentScore').textContent = `${sentimentScore} / 100`;
+
+    // ===== ENHANCED FUNCTIONALITY =====
+
+    // ----- Attrition Risk Prediction -----
+    let riskFactors = [
+      { factor: 'Low mood + High workload', duration: '2+ weeks', risk: 'High', score: 85 },
+      { factor: 'Frequent overtime', duration: '3+ weeks', risk: 'Medium', score: 62 },
+      { factor: 'Poor work-life balance', duration: '1+ month', risk: 'Medium', score: 58 },
+      { factor: 'Team conflicts', duration: 'Ongoing', risk: 'Low', score: 34 }
+    ];
+
+    let highRiskEmployees = [
+      { name: 'Sarah Chen', risk: 'Critical', factors: 'Workload + Mood', lastCheck: '2 days ago' },
+      { name: 'Mike Rodriguez', risk: 'High', factors: 'Overtime + Balance', lastCheck: '1 week ago' },
+      { name: 'Emma Thompson', risk: 'High', factors: 'Stress + Conflicts', lastCheck: '3 days ago' }
+    ];
+
+    function renderRiskFactors() {
+      const container = document.getElementById('riskFactors');
+      container.innerHTML = '';
+      riskFactors.forEach(({ factor, duration, risk, score }) => {
+        const riskClass = risk === 'High' ? 'risk-high' : risk === 'Medium' ? 'risk-medium' : 'risk-low';
+        const div = document.createElement('div');
+        div.className = 'risk-factor';
+        div.innerHTML = `
+          <span>${factor}</span>
+          <div style="display:flex; gap:8px; align-items:center">
+            <span class="badge ${riskClass}">${risk}</span>
+            <span style="font-size:11px; color:var(--muted)">${duration}</span>
+            <strong>${score}%</strong>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function renderHighRiskEmployees() {
+      const container = document.getElementById('highRiskEmployees');
+      container.innerHTML = '';
+      highRiskEmployees.forEach(({ name, risk, factors, lastCheck }) => {
+        const riskClass = risk === 'Critical' ? 'risk-high' : 'risk-medium';
+        const div = document.createElement('div');
+        div.className = 'risk-factor';
+        div.innerHTML = `
+          <div>
+            <div style="font-weight:500">${name}</div>
+            <div style="font-size:11px; color:var(--muted)">${factors}</div>
+          </div>
+          <div style="display:flex; gap:8px; align-items:center">
+            <span class="badge ${riskClass}">${risk}</span>
+            <span style="font-size:11px; color:var(--muted)">${lastCheck}</span>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    // Initialize risk sections
+    renderRiskFactors();
+    renderHighRiskEmployees();
+
+    // Add Risk Factor button
+    document.getElementById('addRiskFactor').addEventListener('click', function() {
+      const factor = prompt('Enter new risk factor:');
+      if (factor) {
+        const duration = prompt('Enter duration (e.g., "2+ weeks"):');
+        const risk = prompt('Enter risk level (Low/Medium/High):');
+        const score = parseInt(prompt('Enter risk score (0-100):'));
+        
+        if (factor && duration && risk && !isNaN(score)) {
+          riskFactors.push({ factor, duration, risk, score });
+          renderRiskFactors();
+        }
+      }
+    });
+
+    // Add Employee button
+    document.getElementById('addEmployee').addEventListener('click', function() {
+      const name = prompt('Enter employee name:');
+      if (name) {
+        const factors = prompt('Enter risk factors:');
+        const risk = prompt('Enter risk level (High/Critical):');
+        
+        if (name && factors && risk) {
+          highRiskEmployees.push({ 
+            name, 
+            risk, 
+            factors, 
+            lastCheck: 'Just now' 
+          });
+          renderHighRiskEmployees();
+        }
+      }
+    });
+
+    // Risk Assessment Form
+    document.getElementById('addEmployee').addEventListener('click', function() {
+      document.getElementById('riskAssessmentForm').style.display = 'block';
+    });
+
+    document.getElementById('cancelAssessment').addEventListener('click', function() {
+      document.getElementById('riskAssessmentForm').style.display = 'none';
+    });
+
+    document.getElementById('calculateRisk').addEventListener('click', function() {
+      const name = document.getElementById('employeeName').value;
+      const workload = document.getElementById('workloadLevel').value;
+      const mood = parseInt(document.getElementById('moodScore').value);
+      
+      if (!name || !workload || !mood) {
+        alert('Please fill in all fields');
+        return;
+      }
+
+      // Calculate risk score based on workload and mood
+      let riskScore = 0;
+      let riskLevel = 'Low';
+      
+      if (workload === 'critical') riskScore += 40;
+      else if (workload === 'high') riskScore += 30;
+      else if (workload === 'medium') riskScore += 20;
+      
+      if (mood <= 2) riskScore += 40;
+      else if (mood <= 4) riskScore += 30;
+      else if (mood <= 6) riskScore += 20;
+      
+      if (riskScore >= 60) riskLevel = 'Critical';
+      else if (riskScore >= 40) riskLevel = 'High';
+      else if (riskScore >= 20) riskLevel = 'Medium';
+      
+      // Add to high risk employees
+      highRiskEmployees.push({
+        name,
+        risk: riskLevel,
+        factors: `${workload} workload + ${mood}/10 mood`,
+        lastCheck: 'Just now'
+      });
+      
+      renderHighRiskEmployees();
+      document.getElementById('riskAssessmentForm').style.display = 'none';
+      document.getElementById('riskAssessmentForm').reset();
+      
+      alert(`Risk Assessment Complete!\n${name}: ${riskLevel} Risk (${riskScore}/100)`);
+    });
+
+    // ----- Downloadable Reports -----
+    let recentDownloads = [
+      { name: 'Well-being Summary', format: 'PDF', date: '2 hours ago', size: '2.4 MB' },
+      { name: 'Productivity Metrics', format: 'CSV', date: '1 day ago', size: '156 KB' },
+      { name: 'Team Performance', format: 'CSV', date: '3 days ago', size: '89 KB' }
+    ];
+
+    function renderRecentDownloads() {
+      const container = document.getElementById('recentDownloads');
+      container.innerHTML = '';
+      recentDownloads.forEach(({ name, format, date, size }) => {
+        const div = document.createElement('div');
+        div.className = 'download-item';
+        div.innerHTML = `
+          <span>${name}</span>
+          <div style="display:flex; gap:8px; align-items:center">
+            <span class="format-badge">${format}</span>
+            <span style="font-size:11px; color:var(--muted)">${date}</span>
+            <span style="font-size:11px; color:var(--muted)">${size}</span>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    renderRecentDownloads();
+
+    // Enhanced report generation
+    document.querySelectorAll('.report-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const type = this.dataset.type;
+        const format = this.dataset.format;
+        
+        // Show progress
+        const progress = document.getElementById('reportProgress');
+        const progressBar = document.getElementById('progressBar');
+        progress.style.display = 'block';
+        
+        // Simulate report generation
+        let progressValue = 0;
+        const interval = setInterval(() => {
+          progressValue += Math.random() * 20;
+          if (progressValue > 100) progressValue = 100;
+          progressBar.style.width = progressValue + '%';
+          
+          if (progressValue >= 100) {
+            clearInterval(interval);
+            setTimeout(() => {
+              progress.style.display = 'none';
+              progressBar.style.width = '0%';
+              
+              // Generate and download file
+              generateReport(type, format);
+            }, 500);
+          }
+        }, 200);
+      });
+    });
+
+    function generateReport(type, format) {
+      const dateRange = document.getElementById('dateRange').value;
+      const includeCharts = document.getElementById('includeCharts').checked;
+      const theme = document.getElementById('reportTheme').value;
+      
+      // Create report content
+      let content = '';
+      let filename = '';
+      
+      if (format === 'CSV') {
+        content = `Report Type,${type}\nDate Range,${dateRange} days\nInclude Charts,${includeCharts}\nTheme,${theme}\nGenerated,${new Date().toLocaleString()}\n\n`;
+        
+        if (type === 'wellbeing') {
+          content += 'Month,Productivity,Well-being\n';
+          wellbeingData.forEach(d => {
+            content += `${d.m},${d.prod},${d.wb}\n`;
+          });
+        } else if (type === 'productivity') {
+          content += 'Month,Expense,Profit\n';
+          expenseProfit.forEach(d => {
+            content += `${d.m},${d.expense},${d.profit}\n`;
+          });
+        }
+        
+        filename = `${type}_report_${new Date().toISOString().split('T')[0]}.csv`;
+      } else {
+        content = `Report: ${type}\nDate Range: ${dateRange} days\nInclude Charts: ${includeCharts}\nTheme: ${theme}\nGenerated: ${new Date().toLocaleString()}\n\n`;
+        filename = `${type}_report_${new Date().toISOString().split('T')[0]}.txt`;
+      }
+      
+      // Create and download file
+      const blob = new Blob([content], { type: format === 'CSV' ? 'text/csv' : 'text/plain' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.click();
+      window.URL.revokeObjectURL(url);
+      
+      // Add to recent downloads
+      const newDownload = {
+        name: `${type.charAt(0).toUpperCase() + type.slice(1)} Report`,
+        format: format.toUpperCase(),
+        date: 'Just now',
+        size: `${Math.round(content.length / 1024 * 100) / 100} KB`
+      };
+      
+      recentDownloads.unshift(newDownload);
+      if (recentDownloads.length > 10) recentDownloads.pop();
+      renderRecentDownloads();
+      
+      alert(`Report "${filename}" downloaded successfully!`);
+    }
+
+    // Clear downloads history
+    document.getElementById('clearDownloads').addEventListener('click', function() {
+      if (confirm('Clear all download history?')) {
+        recentDownloads = [];
+        renderRecentDownloads();
+      }
+    });
+
+    // ----- Send Announcements -----
+    let recentAnnouncements = [
+      { title: 'Team Meeting Tomorrow', content: 'Weekly sync at 10 AM. Please prepare your updates.', urgent: false, date: '1 hour ago', audience: 'all' },
+      { title: 'System Maintenance', content: 'Platform will be down for 2 hours tonight for updates.', urgent: true, date: '3 hours ago', audience: 'all' },
+      { title: 'New Project Launch', content: 'Exciting new initiative starting next week. Details to follow.', urgent: false, date: '1 day ago', audience: 'managers' }
+    ];
+
+    let allAnnouncements = [...recentAnnouncements];
+
+    function renderAnnouncements(announcements = allAnnouncements) {
+      const container = document.getElementById('recentAnnouncements');
+      container.innerHTML = '';
+      announcements.forEach(({ title, content, urgent, date, audience }) => {
+        const div = document.createElement('div');
+        div.className = `announcement-item ${urgent ? 'urgent' : ''}`;
+        div.innerHTML = `
+          <div class="announcement-title">${title}</div>
+          <div style="font-size:12px; margin-bottom:4px">${content}</div>
+          <div class="announcement-meta">${date} • ${audience}${urgent ? ' • Urgent' : ''}</div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    renderAnnouncements();
+
+    // Schedule options toggle
+    document.getElementById('scheduleFlag').addEventListener('change', function() {
+      const scheduleOptions = document.getElementById('scheduleOptions');
+      scheduleOptions.style.display = this.checked ? 'block' : 'none';
+    });
+
+    // Preview functionality
+    document.getElementById('previewBtn').addEventListener('click', function() {
+      const title = document.getElementById('announcementTitle').value;
+      const content = document.getElementById('announcementContent').value;
+      const urgent = document.getElementById('urgentFlag').checked;
+      const audience = document.getElementById('targetAudience').value;
+      
+      if (!title || !content) {
+        alert('Please fill in both title and content');
+        return;
+      }
+      
+      const previewContent = document.getElementById('previewContent');
+      previewContent.innerHTML = `
+        <div style="font-weight:600; font-size:16px; margin-bottom:8px; color:${urgent ? '#dc2626' : '#0f172a'}">${urgent ? '🚨 URGENT: ' : ''}${title}</div>
+        <div style="margin-bottom:12px; line-height:1.5">${content}</div>
+        <div style="font-size:12px; color:var(--muted); border-top:1px solid var(--line); padding-top:8px">
+          <strong>Target:</strong> ${audience}<br>
+          <strong>Priority:</strong> ${urgent ? 'High' : 'Normal'}<br>
+          <strong>Timestamp:</strong> ${new Date().toLocaleString()}
+        </div>
+      `;
+      
+      document.getElementById('previewModal').style.display = 'flex';
+    });
+
+    // Close preview modal
+    document.getElementById('closePreview').addEventListener('click', function() {
+      document.getElementById('previewModal').style.display = 'none';
+    });
+
+    // Send from preview
+    document.getElementById('sendFromPreview').addEventListener('click', function() {
+      document.getElementById('previewModal').style.display = 'none';
+      document.getElementById('announcementForm').dispatchEvent(new Event('submit'));
+    });
+
+    // Edit from preview
+    document.getElementById('editPreview').addEventListener('click', function() {
+      document.getElementById('previewModal').style.display = 'none';
+    });
+
+    // Filter announcements
+    document.getElementById('filterUrgent').addEventListener('click', function() {
+      const urgentOnly = allAnnouncements.filter(a => a.urgent);
+      renderAnnouncements(urgentOnly);
+    });
+
+    document.getElementById('showAll').addEventListener('click', function() {
+      renderAnnouncements();
+    });
+
+    // Enhanced announcement form submission
+    document.getElementById('announcementForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const title = document.getElementById('announcementTitle').value;
+      const content = document.getElementById('announcementContent').value;
+      const urgent = document.getElementById('urgentFlag').checked;
+      const schedule = document.getElementById('scheduleFlag').checked;
+      const audience = document.getElementById('targetAudience').value;
+      
+      if (!title || !content) {
+        alert('Please fill in both title and content.');
+        return;
+      }
+
+      let scheduledDate = '';
+      if (schedule) {
+        const date = document.getElementById('scheduleDate').value;
+        const time = document.getElementById('scheduleTime').value;
+        if (!date || !time) {
+          alert('Please select both date and time for scheduling.');
+          return;
+        }
+        scheduledDate = ` (Scheduled for ${date} at ${time})`;
+      }
+
+      // Create new announcement
+      const newAnnouncement = {
+        title,
+        content,
+        urgent,
+        date: schedule ? `Scheduled${scheduledDate}` : 'Just now',
+        audience
+      };
+      
+      allAnnouncements.unshift(newAnnouncement);
+      recentAnnouncements = allAnnouncements.slice(0, 10);
+      renderAnnouncements();
+      
+      // Clear form
+      this.reset();
+      document.getElementById('scheduleOptions').style.display = 'none';
+      
+      if (schedule) {
+        alert(`Announcement scheduled successfully for ${date} at ${time}!`);
+      } else {
+        alert('Announcement sent successfully!');
+      }
+    });
+
+    // Set default date/time for scheduling
+    document.addEventListener('DOMContentLoaded', function() {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      document.getElementById('scheduleDate').value = tomorrow.toISOString().split('T')[0];
+      document.getElementById('scheduleTime').value = '09:00';
+    });
+
   </script>
 </body>
-</html>
+</html> 

@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Employee Well-being Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg: #f4f7f8;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --line: #e5e7eb;
+      --teal-50:#e6fbf7; --teal-200:#b7d7d2; --teal-600:#2c6d62;
+      --green-50:#ecfdf5; --green-600:#059669;
+      --cyan-50:#e6fafe; --cyan-600:#0891b2;
+      --amber-50:#fff7ed; --amber-600:#d97706;
+      --rose-50:#fef2f2; --rose-600:#dc2626;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+    }
+    .shell {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .welcome {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--teal-600);
+    }
+    .subtitle {
+      color: var(--muted);
+      font-size: 16px;
+    }
+    
+    .grid { display: grid; gap: 20px; }
+    .grid.cols-3 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+    @media (min-width: 768px) { .grid.cols-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (min-width: 1024px) { .grid.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+    
+    .card { 
+      background: var(--card); 
+      border: 1px solid var(--line); 
+      border-radius: 16px; 
+      padding: 24px; 
+      box-shadow: 0 1px 2px rgba(0,0,0,.04); 
+    }
+    .card h3 { margin: 0 0 16px; font-size: 18px; font-weight: 600; }
+    
+    .stat {
+      border: 1px solid var(--line); 
+      border-radius: 16px; 
+      padding: 20px; 
+      box-shadow: 0 1px 2px rgba(0,0,0,.04);
+      display: grid; 
+      grid-template-columns: auto 1fr; 
+      align-items: center; 
+      gap: 16px;
+    }
+    .tone-teal { background: var(--teal-50); color: #0b3b35; }
+    .tone-green { background: var(--green-50); color: #064e3b; }
+    .tone-cyan { background: var(--cyan-50); color: #083344; }
+    .tone-amber { background: var(--amber-50); color: #7c2d12; }
+    .stat .value { font-size: 32px; font-weight: 700; text-align: right; }
+    .stat .label { font-size: 14px; opacity: .7; text-align: right; }
+    
+    .chart-wrap { height: 300px; margin-top: 16px; }
+    
+    .wellbeing-score {
+      text-align: center;
+      padding: 32px;
+    }
+    .score-circle {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      margin: 0 auto 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      font-weight: 700;
+      color: white;
+    }
+    .score-excellent { background: var(--green-600); }
+    .score-good { background: var(--cyan-600); }
+    .score-average { background: var(--amber-600); }
+    .score-poor { background: var(--rose-600); }
+    
+    .mood-tracker {
+      display: grid;
+      gap: 12px;
+    }
+    .mood-option {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .mood-option:hover {
+      background: var(--teal-50);
+      border-color: var(--teal-200);
+    }
+    .mood-option.selected {
+      background: var(--teal-50);
+      border-color: var(--teal-600);
+    }
+    .mood-emoji { font-size: 24px; }
+    
+    .tips-section {
+      background: var(--teal-50);
+      border: 1px solid var(--teal-200);
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+    .tips-section h4 {
+      margin: 0 0 12px;
+      color: var(--teal-600);
+      font-size: 16px;
+    }
+    .tip-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin-bottom: 8px;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+    .tip-icon {
+      color: var(--teal-600);
+      font-size: 16px;
+      margin-top: 2px;
+    }
+    
+    .progress { 
+      height: 8px; 
+      width: 100%; 
+      background: #f1f5f9; 
+      border-radius: 999px; 
+      overflow: hidden; 
+      margin-top: 8px;
+    }
+    .progress > span { 
+      display: block; 
+      height: 100%; 
+      background: var(--teal-600); 
+      transition: width 0.3s ease;
+    }
+    
+    .badge { 
+      font-size: 12px; 
+      padding: 4px 8px; 
+      border-radius: 999px; 
+      border: 1px solid var(--line); 
+    }
+    .status-active { background: var(--green-50); color: #065f46; border-color: #bbf7d0; }
+    .status-warning { background: var(--amber-50); color: #7c2d12; border-color: #fed7aa; }
+    
+    .announcement-item {
+      padding: 16px;
+      background: #f8fafc;
+      border-radius: 8px;
+      border-left: 3px solid var(--teal-600);
+      margin-bottom: 12px;
+    }
+    .announcement-item.urgent {
+      border-left-color: var(--rose-600);
+      background: var(--rose-50);
+    }
+    .announcement-title {
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+    .announcement-meta {
+      font-size: 12px;
+      color: var(--muted);
+    }
+    
+    .btn {
+      background: var(--teal-600);
+      color: white;
+      border: 0;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    .btn:hover {
+      background: var(--teal-700);
+      transform: translateY(-1px);
+    }
+    .btn-secondary {
+      background: var(--muted);
+    }
+    .btn-secondary:hover {
+      background: #475569;
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <!-- Header with User Info -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding: 16px; background: var(--card); border-radius: 12px; border: 1px solid var(--line);">
+      <div>
+        <div style="font-size: 14px; color: var(--muted); margin-bottom: 4px;">Welcome back</div>
+        <div style="font-size: 18px; font-weight: 600; color: var(--teal-600);" id="userName">Sarah</div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="font-size: 14px; color: var(--muted);" id="userEmail">sarah@company.com</div>
+        <button class="btn btn-secondary" id="logoutBtn" style="padding: 8px 16px; font-size: 12px;">Logout</button>
+      </div>
+    </div>
+
+    <!-- Header -->
+    <div class="header">
+      <div class="welcome">Welcome back, <span id="displayName">Sarah</span>! 👋</div>
+      <div class="subtitle">Here's how you're doing this week</div>
+    </div>
+
+    <!-- Overview Stats -->
+    <section class="grid cols-3" style="margin-bottom: 32px">
+      <div class="stat tone-teal">
+        <div style="background:#fff; padding:12px; border-radius:16px; box-shadow:0 2px 4px rgba(0,0,0,.08);">📊</div>
+        <div>
+          <div class="value">78</div>
+          <div class="label">Well-being Score</div>
+        </div>
+      </div>
+      <div class="stat tone-green">
+        <div style="background:#fff; padding:12px; border-radius:16px; box-shadow:0 2px 4px rgba(0,0,0,.08);">⚡</div>
+        <div>
+          <div class="value">85</div>
+          <div class="label">Productivity</div>
+        </div>
+      </div>
+      <div class="stat tone-cyan">
+        <div style="background:#fff; padding:12px; border-radius:16px; box-shadow:0 2px 4px rgba(0,0,0,.08);">🎯</div>
+        <div>
+          <div class="value">6</div>
+          <div class="label">Goals Completed</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Content Grid -->
+    <div class="grid cols-3">
+      <!-- Well-being Overview -->
+      <div class="card">
+        <h3>Your Well-being Overview</h3>
+        <div class="wellbeing-score">
+          <div class="score-circle score-good">78</div>
+          <div style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">Good</div>
+          <div style="color: var(--muted); font-size: 14px;">You're doing well! Keep it up.</div>
+        </div>
+        
+        <div class="tips-section">
+          <h4>💡 Tips for this week</h4>
+          <div class="tip-item">
+            <span class="tip-icon">✅</span>
+            <span>Take regular breaks every 90 minutes</span>
+          </div>
+          <div class="tip-item">
+            <span class="tip-icon">✅</span>
+            <span>Practice deep breathing exercises</span>
+          </div>
+          <div class="tip-item">
+            <span class="tip-icon">✅</span>
+            <span>Stay hydrated - aim for 8 glasses daily</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mood Tracker -->
+      <div class="card">
+        <h3>How are you feeling today?</h3>
+        <div class="mood-tracker">
+          <div class="mood-option" data-mood="5">
+            <span class="mood-emoji">😊</span>
+            <span>Great - I'm feeling productive and happy</span>
+          </div>
+          <div class="mood-option" data-mood="4">
+            <span class="mood-emoji">🙂</span>
+            <span>Good - generally positive mood</span>
+          </div>
+          <div class="mood-option" data-mood="3">
+            <span class="mood-emoji">😐</span>
+            <span>Okay - neutral, neither good nor bad</span>
+          </div>
+          <div class="mood-option" data-mood="2">
+            <span class="mood-emoji">😕</span>
+            <span>Stressed - feeling overwhelmed</span>
+          </div>
+          <div class="mood-option" data-mood="1">
+            <span class="mood-emoji">😰</span>
+            <span>Struggling - need support</span>
+          </div>
+        </div>
+        
+        <div style="margin-top: 20px; text-align: center;">
+          <button class="btn" id="submitMood">Submit Today's Mood</button>
+        </div>
+        
+        <div id="moodSubmitted" style="display: none; margin-top: 16px; padding: 12px; background: var(--green-50); border-radius: 8px; text-align: center; color: var(--green-600);">
+          ✅ Mood submitted! Thank you for sharing.
+        </div>
+      </div>
+
+      <!-- Work-Life Balance -->
+      <div class="card">
+        <h3>Work-Life Balance</h3>
+        <div style="margin-bottom: 20px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <span style="font-size: 14px;">Work Hours</span>
+            <span style="font-weight: 600;">7.5 / 8 hours</span>
+          </div>
+          <div class="progress">
+            <span style="width: 94%;"></span>
+          </div>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <span style="font-size: 14px;">Break Time</span>
+            <span style="font-weight: 600;">45 / 60 minutes</span>
+          </div>
+          <div class="progress">
+            <span style="width: 75%;"></span>
+          </div>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <span style="font-size: 14px;">Overtime</span>
+            <span style="font-weight: 600;">0 hours</span>
+          </div>
+          <div class="progress">
+            <span style="width: 0%;"></span>
+          </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 24px;">
+          <span class="badge status-active">Balanced</span>
+        </div>
+      </div>
+
+      <!-- Weekly Progress -->
+      <div class="card">
+        <h3>This Week's Progress</h3>
+        <div class="chart-wrap">
+          <canvas id="weeklyChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Recent Announcements -->
+      <div class="card">
+        <h3>Recent Announcements</h3>
+        <div id="announcementsList">
+          <div class="announcement-item">
+            <div class="announcement-title">Team Meeting Tomorrow</div>
+            <div style="font-size: 13px; margin-bottom: 8px;">Weekly sync at 10 AM. Please prepare your updates.</div>
+            <div class="announcement-meta">1 hour ago • All Employees</div>
+          </div>
+          <div class="announcement-item urgent">
+            <div class="announcement-title">System Maintenance</div>
+            <div style="font-size: 13px; margin-bottom: 8px;">Platform will be down for 2 hours tonight for updates.</div>
+            <div class="announcement-meta">3 hours ago • All Employees • Urgent</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="card">
+        <h3>Quick Actions</h3>
+        <div style="display: grid; gap: 12px;">
+          <button class="btn" onclick="requestTimeOff()">🏖️ Request Time Off</button>
+          <button class="btn btn-secondary" onclick="scheduleMeeting()">📅 Schedule 1:1 Meeting</button>
+          <button class="btn btn-secondary" onclick="reportIssue()">🚨 Report an Issue</button>
+          <button class="btn btn-secondary" onclick="viewResources()">📚 View Resources</button>
+        </div>
+        
+        <div style="margin-top: 24px; padding: 16px; background: #f8fafc; border-radius: 8px;">
+          <h4 style="margin: 0 0 8px; font-size: 14px;">Need Help?</h4>
+          <p style="margin: 0; font-size: 13px; color: var(--muted); line-height: 1.4;">
+            Our HR team is here to support you. Don't hesitate to reach out if you need assistance with anything.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ===== AUTHENTICATION & SECURITY =====
+    
+    // Check if user is logged in and has employee role
+    function checkAuth() {
+      const isLoggedIn = localStorage.getItem('isLoggedIn');
+      const userRole = localStorage.getItem('userRole');
+      const userEmail = localStorage.getItem('userEmail');
+      
+      if (!isLoggedIn || userRole !== 'employee') {
+        // Redirect to login if not authenticated or not employee
+        window.location.href = 'login.html';
+        return false;
+      }
+      
+      // Update user info in the UI
+      if (userEmail) {
+        document.getElementById('userEmail').textContent = userEmail;
+        // Extract name from email for demo purposes
+        const name = userEmail.split('@')[0];
+        const displayName = name.charAt(0).toUpperCase() + name.slice(1);
+        document.getElementById('userName').textContent = displayName;
+        document.getElementById('displayName').textContent = displayName;
+      }
+      
+      return true;
+    }
+    
+    // Logout functionality
+    document.getElementById('logoutBtn').addEventListener('click', function() {
+      localStorage.removeItem('isLoggedIn');
+      localStorage.removeItem('userRole');
+      localStorage.removeItem('userEmail');
+      window.location.href = 'login.html';
+    });
+    
+    // Check authentication on page load
+    if (!checkAuth()) {
+      // Stop execution if not authenticated
+      throw new Error('Authentication failed');
+    }
+    
+    // ===== DASHBOARD FUNCTIONALITY =====
+
+    // Mood Tracker Functionality
+    let selectedMood = null;
+    
+    document.querySelectorAll('.mood-option').forEach(option => {
+      option.addEventListener('click', function() {
+        // Remove previous selection
+        document.querySelectorAll('.mood-option').forEach(opt => opt.classList.remove('selected'));
+        // Add selection to clicked option
+        this.classList.add('selected');
+        selectedMood = this.dataset.mood;
+      });
+    });
+    
+    document.getElementById('submitMood').addEventListener('click', function() {
+      if (!selectedMood) {
+        alert('Please select a mood first!');
+        return;
+      }
+      
+      document.getElementById('moodSubmitted').style.display = 'block';
+      this.textContent = 'Mood Submitted';
+      this.disabled = true;
+      this.style.background = 'var(--green-600)';
+      
+      // In a real app, this would send data to the server
+      console.log('Mood submitted:', selectedMood);
+    });
+
+    // Weekly Progress Chart
+    const weeklyCtx = document.getElementById('weeklyChart');
+    new Chart(weeklyCtx, {
+      type: 'line',
+      data: {
+        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+        datasets: [
+          { 
+            label: 'Well-being', 
+            data: [75, 78, 82, 79, 78], 
+            borderColor: '#059669', 
+            backgroundColor: 'rgba(5,150,105,0.1)', 
+            tension: 0.4, 
+            fill: true 
+          },
+          { 
+            label: 'Productivity', 
+            data: [80, 85, 88, 82, 85], 
+            borderColor: '#0891b2', 
+            backgroundColor: 'rgba(8,145,178,0.1)', 
+            tension: 0.4, 
+            fill: true 
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: { 
+            beginAtZero: true, 
+            max: 100, 
+            grid: { color: '#eef2f7' } 
+          },
+          x: { 
+            grid: { display: false } 
+          }
+        },
+        plugins: { 
+          legend: { 
+            position: 'bottom',
+            labels: {
+              usePointStyle: true,
+              padding: 20
+            }
+          } 
+        }
+      }
+    });
+
+    // Quick Action Functions
+    function requestTimeOff() {
+      alert('Time off request form would open here. In a real app, this would navigate to a form page.');
+    }
+    
+    function scheduleMeeting() {
+      alert('Meeting scheduler would open here. In a real app, this would open a calendar interface.');
+    }
+    
+    function reportIssue() {
+      alert('Issue reporting form would open here. In a real app, this would open a support ticket form.');
+    }
+    
+    function viewResources() {
+      alert('Resources page would open here. In a real app, this would navigate to a resources library.');
+    }
+
+    // Simulate real-time updates
+    setInterval(() => {
+      // Update break time progress
+      const breakProgress = document.querySelector('.progress:nth-of-type(2) span');
+      const currentBreak = parseInt(breakProgress.style.width) || 75;
+      if (currentBreak < 100) {
+        breakProgress.style.width = Math.min(currentBreak + 1, 100) + '%';
+      }
+    }, 30000); // Update every 30 seconds
+  </script>
+</body>
+</html>

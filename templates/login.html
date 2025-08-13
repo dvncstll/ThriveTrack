@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ThriveTrack - Login</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f4f7f8;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --line: #e5e7eb;
+      --teal-50:#e6fbf7; --teal-200:#b7d7d2; --teal-600:#2c6d62;
+      --green-50:#ecfdf5; --green-600:#059669;
+      --cyan-50:#e6fafe; --cyan-600:#0891b2;
+      --amber-50:#fff7ed; --amber-600:#d97706;
+      --rose-50:#fef2f2; --rose-600:#dc2626;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      background: linear-gradient(135deg, var(--teal-50) 0%, var(--cyan-50) 100%);
+      color: var(--text);
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    
+    .login-container {
+      background: var(--card);
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+      padding: 40px;
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+    
+    .logo {
+      margin-bottom: 32px;
+    }
+    .logo-icon {
+      width: 64px;
+      height: 64px;
+      background: linear-gradient(135deg, var(--teal-600), var(--cyan-600));
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+      font-size: 32px;
+    }
+    .logo-text {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--teal-600);
+      margin-bottom: 8px;
+    }
+    .logo-subtitle {
+      color: var(--muted);
+      font-size: 14px;
+    }
+    
+    .welcome-text {
+      margin-bottom: 32px;
+    }
+    .welcome-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .welcome-subtitle {
+      color: var(--muted);
+      font-size: 14px;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+      text-align: left;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      font-size: 14px;
+      color: var(--text);
+    }
+    .form-group input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid var(--line);
+      border-radius: 12px;
+      font-size: 16px;
+      transition: all 0.2s;
+      box-sizing: border-box;
+    }
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--teal-600);
+      box-shadow: 0 0 0 3px rgba(44, 109, 98, 0.1);
+    }
+    
+    .role-selector {
+      margin-bottom: 24px;
+    }
+    .role-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .role-option {
+      padding: 16px;
+      border: 2px solid var(--line);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+      background: var(--card);
+    }
+    .role-option:hover {
+      border-color: var(--teal-200);
+      background: var(--teal-50);
+    }
+    .role-option.selected {
+      border-color: var(--teal-600);
+      background: var(--teal-50);
+    }
+    .role-option.selected .role-icon {
+      color: var(--teal-600);
+    }
+    .role-icon {
+      font-size: 24px;
+      margin-bottom: 8px;
+      display: block;
+    }
+    .role-label {
+      font-weight: 500;
+      font-size: 14px;
+    }
+    
+    .login-btn {
+      width: 100%;
+      background: var(--teal-600);
+      color: white;
+      border: 0;
+      padding: 16px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 16px;
+    }
+    .login-btn:hover {
+      background: var(--teal-700);
+      transform: translateY(-1px);
+    }
+    .login-btn:disabled {
+      background: var(--muted);
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .demo-accounts {
+      margin-top: 24px;
+      padding: 16px;
+      background: var(--teal-50);
+      border-radius: 12px;
+      border: 1px solid var(--teal-200);
+    }
+    .demo-accounts h4 {
+      margin: 0 0 12px;
+      font-size: 14px;
+      color: var(--teal-600);
+    }
+    .demo-account {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 12px;
+    }
+    .demo-account:last-child {
+      margin-bottom: 0;
+    }
+    .demo-role {
+      font-weight: 500;
+      color: var(--teal-600);
+    }
+    .demo-credentials {
+      color: var(--muted);
+      font-family: monospace;
+    }
+    
+    .error-message {
+      color: var(--rose-600);
+      background: var(--rose-50);
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      font-size: 14px;
+      display: none;
+    }
+    
+    .success-message {
+      color: var(--green-600);
+      background: var(--green-50);
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      font-size: 14px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <!-- Logo -->
+    <div class="logo">
+      <div class="logo-icon">🌱</div>
+      <div class="logo-text">ThriveTrack</div>
+      <div class="logo-subtitle">Employee Well-being Platform</div>
+    </div>
+    
+    <!-- Welcome Text -->
+    <div class="welcome-text">
+      <div class="welcome-title">Welcome Back!</div>
+      <div class="welcome-subtitle">Sign in to access your dashboard</div>
+    </div>
+    
+    <!-- Error/Success Messages -->
+    <div id="errorMessage" class="error-message"></div>
+    <div id="successMessage" class="success-message"></div>
+    
+    <!-- Login Form -->
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" name="email" placeholder="Enter your email" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="Enter your password" required>
+      </div>
+      
+      <div class="form-group role-selector">
+        <label>Select Your Role</label>
+        <div class="role-options">
+          <div class="role-option" data-role="employee">
+            <span class="role-icon">👤</span>
+            <span class="role-label">Employee</span>
+          </div>
+          <div class="role-option" data-role="hr">
+            <span class="role-icon">👔</span>
+            <span class="role-label">HR Manager</span>
+          </div>
+        </div>
+      </div>
+      
+      <button type="submit" class="login-btn" id="loginBtn">Sign In</button>
+    </form>
+    
+    <!-- Demo Accounts -->
+    <div class="demo-accounts">
+      <h4>💡 Demo Accounts</h4>
+      <div class="demo-account">
+        <span class="demo-role">Employee:</span>
+        <span class="demo-credentials">sarah@company.com / demo123</span>
+      </div>
+      <div class="demo-account">
+        <span class="demo-role">HR Manager:</span>
+        <span class="demo-credentials">nirmal@company.com / demo123</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let selectedRole = null;
+    
+    // Role selection
+    document.querySelectorAll('.role-option').forEach(option => {
+      option.addEventListener('click', function() {
+        // Remove previous selection
+        document.querySelectorAll('.role-option').forEach(opt => opt.classList.remove('selected'));
+        // Add selection to clicked option
+        this.classList.add('selected');
+        selectedRole = this.dataset.role;
+        
+        // Update button state
+        updateLoginButton();
+      });
+    });
+    
+    // Update login button state
+    function updateLoginButton() {
+      const loginBtn = document.getElementById('loginBtn');
+      if (selectedRole) {
+        loginBtn.disabled = false;
+        loginBtn.textContent = `Sign In as ${selectedRole === 'hr' ? 'HR Manager' : 'Employee'}`;
+      } else {
+        loginBtn.disabled = true;
+        loginBtn.textContent = 'Select Role to Continue';
+      }
+    }
+    
+    // Initialize button state
+    updateLoginButton();
+    
+    // Form submission
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      
+      // Hide previous messages
+      hideMessages();
+      
+      // Validation
+      if (!email || !password) {
+        showError('Please fill in all fields');
+        return;
+      }
+      
+      if (!selectedRole) {
+        showError('Please select your role');
+        return;
+      }
+      
+      // Simulate authentication (in real app, this would be an API call)
+      if (authenticateUser(email, password, selectedRole)) {
+        showSuccess('Login successful! Redirecting...');
+        
+        // Store user info in localStorage
+        localStorage.setItem('userEmail', email);
+        localStorage.setItem('userRole', selectedRole);
+        localStorage.setItem('isLoggedIn', 'true');
+        
+        // Redirect after delay
+        setTimeout(() => {
+          redirectToDashboard(selectedRole);
+        }, 1500);
+      } else {
+        showError('Invalid credentials. Please try again.');
+      }
+    });
+    
+    // Simple authentication (demo purposes)
+    function authenticateUser(email, password, role) {
+      // Demo accounts
+      const validAccounts = {
+        'sarah@company.com': { password: 'demo123', role: 'employee' },
+        'nirmal@company.com': { password: 'demo123', role: 'hr' }
+      };
+      
+      if (validAccounts[email]) {
+        const account = validAccounts[email];
+        return account.password === password && account.role === role;
+      }
+      
+      return false;
+    }
+    
+    // Redirect to appropriate dashboard
+    function redirectToDashboard(role) {
+      if (role === 'hr') {
+        window.location.href = 'index.html';
+      } else {
+        window.location.href = 'employee-dashboard.html';
+      }
+    }
+    
+    // Message handling
+    function showError(message) {
+      const errorDiv = document.getElementById('errorMessage');
+      errorDiv.textContent = message;
+      errorDiv.style.display = 'block';
+    }
+    
+    function showSuccess(message) {
+      const successDiv = document.getElementById('successMessage');
+      successDiv.textContent = message;
+      successDiv.style.display = 'block';
+    }
+    
+    function hideMessages() {
+      document.getElementById('errorMessage').style.display = 'none';
+      document.getElementById('successMessage').style.display = 'none';
+    }
+    
+    // Auto-fill demo accounts on click
+    document.querySelectorAll('.demo-account').forEach(account => {
+      account.addEventListener('click', function() {
+        const role = this.querySelector('.demo-role').textContent.toLowerCase().replace(':', '');
+        const credentials = this.querySelector('.demo-credentials').textContent;
+        const [email, password] = credentials.split(' / ');
+        
+        document.getElementById('email').value = email;
+        document.getElementById('password').value = password;
+        
+        // Select appropriate role
+        document.querySelectorAll('.role-option').forEach(opt => opt.classList.remove('selected'));
+        if (role === 'hr') {
+          document.querySelector('[data-role="hr"]').classList.add('selected');
+          selectedRole = 'hr';
+        } else {
+          document.querySelector('[data-role="employee"]').classList.add('selected');
+          selectedRole = 'employee';
+        }
+        
+        updateLoginButton();
+      });
+    });
+    
+    // Check if user is already logged in
+    window.addEventListener('load', function() {
+      const isLoggedIn = localStorage.getItem('isLoggedIn');
+      const userRole = localStorage.getItem('userRole');
+      
+      if (isLoggedIn === 'true' && userRole) {
+        // Auto-redirect to appropriate dashboard
+        redirectToDashboard(userRole);
+      }
+    });
+  </script>
+</body>
+</html>
