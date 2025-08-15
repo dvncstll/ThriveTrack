@@ -66,6 +66,14 @@
     }
     .nav button:hover { background: #f8fafc; }
     .nav button.active { background: #eef2f7; font-weight: 600; }
+    .nav .nav-link {
+      width: 100%; text-align: left;
+      padding: 10px 12px; border: 0; background: transparent; cursor: pointer;
+      border-radius: 12px; color: #0f172a; font-size: 14px;
+      text-decoration: none; display: block; transition: all 0.2s;
+    }
+    .nav .nav-link:hover { background: #f8fafc; }
+    .nav .nav-link.active { background: #eef2f7; font-weight: 600; }
     .logout {
       margin-top: auto; width: 100%; border: 1px solid var(--line); background: #fff;
       padding: 10px 12px; border-radius: 12px; cursor: pointer;
@@ -278,13 +286,13 @@
       </div>
 
       <nav class="nav">
-        <button class="active" data-section="dashboard">📊 Dashboard</button>
-        <button data-section="profile">👤 Profile</button>
-        <button data-section="leave">📋 Leave & Attendance</button>
-        <button data-section="workload">⚖️ Workload Assessment</button>
-        <button data-section="feedback">💬 Anonymous Feedback</button>
-        <button data-section="actions">⚡ Quick Actions</button>
-        <button data-section="announcements">📢 Announcements</button>
+        <a href="/employee-dashboard" class="nav-link active">📊 Dashboard</a>
+        <a href="/employee-profile" class="nav-link">👤 Profile</a>
+        <a href="/employee-leave" class="nav-link">📋 Leave & Attendance</a>
+        <a href="/employee-workload" class="nav-link">⚖️ Workload Assessment</a>
+        <a href="/employee-feedback" class="nav-link">💬 Anonymous Feedback</a>
+        <a href="/employee-actions" class="nav-link">⚡ Quick Actions</a>
+        <a href="/employee-announcements" class="nav-link">📢 Announcements</a>
       </nav>
 
       <button class="logout" id="sidebarLogoutBtn">Logout</button>
@@ -304,16 +312,7 @@
        </div>
      </div>
 
-     <!-- Navigation Test Section -->
-     <div style="margin-bottom: 16px; padding: 16px; background: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px;">
-       <h4 style="margin: 0 0 8px; color: #d97706;">🧪 Navigation Test</h4>
-       <p style="margin: 0 0 12px; font-size: 14px;">Click any navigation button in the sidebar to test. You should see console logs and visual feedback.</p>
-       <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-         <button onclick="testNavigation('dashboard')" style="padding: 6px 12px; background: #059669; color: white; border: 0; border-radius: 4px; cursor: pointer; font-size: 12px;">Test Dashboard</button>
-         <button onclick="testNavigation('profile')" style="padding: 6px 12px; background: #0891b2; color: white; border: 0; border-radius: 4px; cursor: pointer; font-size: 12px;">Test Profile</button>
-         <button onclick="testNavigation('leave')" style="padding: 6px 12px; background: #d97706; color: white; border: 0; border-radius: 4px; cursor: pointer; font-size: 12px;">Test Leave</button>
-       </div>
-     </div>
+
 
     <!-- Header -->
     <div class="header">
@@ -643,7 +642,7 @@
       // Update user info in the UI
       if (userEmail) {
         document.getElementById('userEmail').textContent = userEmail;
-        // Extract name from email for demo purposes
+        // Extract name from email
         const name = userEmail.split('@')[0];
         const displayName = name.charAt(0).toUpperCase() + name.slice(1);
         document.getElementById('userName').textContent = displayName;
@@ -759,23 +758,7 @@
       initializeNavigation();
     }
 
-    // Test navigation functionality
-    console.log('Navigation script loaded');
-    console.log('Current sections found:', document.querySelectorAll('[data-section]').length);
-    console.log('Nav buttons found:', document.querySelectorAll('.nav button').length);
 
-    // Test navigation function
-    function testNavigation(sectionName) {
-      console.log('Testing navigation to:', sectionName);
-      showSection(sectionName);
-      
-      // Update active button
-      document.querySelectorAll('.nav button').forEach(btn => btn.classList.remove('active'));
-      const activeButton = document.querySelector(`[data-section="${sectionName}"]`);
-      if (activeButton) {
-        activeButton.classList.add('active');
-      }
-    }
 
     // Sidebar logout functionality
     document.getElementById('sidebarLogoutBtn').addEventListener('click', function() {

@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HR Reporting - ThriveTrack</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f4f7f8;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --line: #e5e7eb;
+      --teal-50:#e6fbf7; --teal-200:#b7d7d2; --teal-600:#2c6d62;
+      --green-50:#ecfdf5; --green-600:#059669;
+      --cyan-50:#e6fafe; --cyan-600:#0891b2;
+      --amber-50:#fff7ed; --amber-600:#d97706;
+      --rose-50:#fef2f2; --rose-600:#dc2626;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+    }
+    .shell {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 960px) {
+      .shell { grid-template-columns: 260px minmax(0,1fr); }
+    }
+
+    /* Sidebar */
+    .sidebar {
+      display: none;
+    }
+    @media (min-width: 960px) {
+      .sidebar {
+        display: flex;
+        position: sticky; top: 0; height: 100vh;
+        flex-direction: column; gap: 14px;
+        background: var(--card);
+        border-right: 1px solid var(--line);
+        padding: 16px;
+      }
+    }
+    .profile {
+      display: flex; gap: 12px; align-items: center;
+      background: #f8fafc; border-radius: 16px; padding: 12px;
+    }
+    .avatar { width: 40px; height: 40px; border-radius: 999px; background: linear-gradient(135deg,#14b8a6,#0f766e); }
+    .muted { color: var(--muted); }
+    .nav .nav-link {
+      width: 100%; text-align: left;
+      padding: 10px 12px; border: 0; background: transparent; cursor: pointer;
+      border-radius: 12px; color: #0f172a; font-size: 14px;
+      text-decoration: none; display: block; transition: all 0.2s;
+    }
+    .nav .nav-link:hover { background: #f8fafc; }
+    .nav .nav-link.active { background: #eef2f7; font-weight: 600; }
+    .logout {
+      margin-top: auto; width: 100%; border: 1px solid var(--line); background: #fff;
+      padding: 10px 12px; border-radius: 12px; cursor: pointer;
+    }
+
+    /* Main */
+    main { padding: 16px; }
+    @media (min-width: 960px) { main { padding: 32px; } }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .welcome {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--teal-600);
+    }
+    .subtitle {
+      color: var(--muted);
+      font-size: 16px;
+    }
+    
+    .card { 
+      background: var(--card); 
+      border: 1px solid var(--line); 
+      border-radius: 16px; 
+      padding: 24px; 
+      box-shadow: 0 1px 2px rgba(0,0,0,.04); 
+      margin-bottom: 24px;
+    }
+    .card h3 { margin: 0 0 16px; font-size: 18px; font-weight: 600; }
+    
+    .btn {
+      background: var(--teal-600);
+      color: white;
+      border: 0;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    .btn:hover {
+      background: var(--teal-700);
+      transform: translateY(-1px);
+    }
+    .btn-secondary {
+      background: var(--muted);
+    }
+    .btn-secondary:hover {
+      background: #475569;
+    }
+    
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;
+    }
+    .stat-card {
+      background: var(--card); padding: 20px; border-radius: 12px; text-align: center;
+      border: 1px solid var(--line);
+    }
+    .stat-value { font-size: 32px; font-weight: 700; color: var(--teal-600); margin-bottom: 8px; }
+    .stat-label { font-size: 14px; color: var(--muted); }
+    
+    .report-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 16px; background: #f8fafc; border-radius: 8px; margin-bottom: 12px;
+      border-left: 3px solid var(--teal-600);
+    }
+    .report-info h4 { margin: 0 0 4px; font-size: 14px; }
+    .report-meta { font-size: 12px; color: var(--muted); }
+    .report-actions { display: flex; gap: 8px; }
+    
+    .chart-container {
+      background: var(--card); padding: 20px; border-radius: 12px; margin-bottom: 16px;
+      border: 1px solid var(--line);
+      height: 300px; display: flex; align-items: center; justify-content: center;
+    }
+    .chart-placeholder {
+      color: var(--muted); font-size: 14px; text-align: center;
+    }
+    
+    .filter-section {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;
+    }
+    .filter-item {
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .filter-item label {
+      font-size: 14px; color: var(--muted); font-weight: 500;
+    }
+    .filter-item select, .filter-item input {
+      padding: 12px; border: 1px solid var(--line); border-radius: 8px; font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="profile">
+        <div class="avatar"></div>
+        <div>
+          <div style="font-weight:600" id="userName">Nirmal Kumar P</div>
+          <div class="muted" style="font-size:12px" id="userEmail">nirmalcom.job@gmail.com</div>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <a href="/" class="nav-link">Dashboard</a>
+        <a href="/hr-inventory" class="nav-link">Inventory</a>
+        <a href="/hr-orders" class="nav-link">Orders</a>
+        <a href="/hr-purchase" class="nav-link">Purchase</a>
+        <a href="/hr-reporting" class="nav-link active">Reporting</a>
+        <a href="/hr-support" class="nav-link">Support</a>
+        <a href="/hr-settings" class="nav-link">Settings</a>
+      </nav>
+
+      <button class="logout" id="logoutBtn">Logout</button>
+    </aside>
+
+    <!-- Main Content -->
+    <main>
+      <!-- Header -->
+      <div class="header">
+        <div class="welcome">HR Reporting & Analytics</div>
+        <div class="subtitle">Generate insights and reports for better decision making</div>
+      </div>
+
+      <!-- Stats Overview -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value">156</div>
+          <div class="stat-label">Total Employees</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">$2.4M</div>
+          <div class="stat-label">Total Budget</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">89%</div>
+          <div class="stat-label">Employee Satisfaction</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">24</div>
+          <div class="stat-label">Active Projects</div>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="card">
+        <h3>Report Filters</h3>
+        <div class="filter-section">
+          <div class="filter-item">
+            <label>Report Type</label>
+            <select id="reportType">
+              <option value="employee">Employee Overview</option>
+              <option value="budget">Budget Analysis</option>
+              <option value="performance">Performance Metrics</option>
+              <option value="attendance">Attendance Report</option>
+              <option value="custom">Custom Report</option>
+            </select>
+          </div>
+          <div class="filter-item">
+            <label>Department</label>
+            <select id="department">
+              <option value="all">All Departments</option>
+              <option value="engineering">Engineering</option>
+              <option value="marketing">Marketing</option>
+              <option value="sales">Sales</option>
+              <option value="hr">HR</option>
+              <option value="finance">Finance</option>
+            </select>
+          </div>
+          <div class="filter-item">
+            <label>Date Range</label>
+            <select id="dateRange">
+              <option value="this-month">This Month</option>
+              <option value="last-month">Last Month</option>
+              <option value="this-quarter">This Quarter</option>
+              <option value="this-year">This Year</option>
+              <option value="custom">Custom Range</option>
+            </select>
+          </div>
+          <div class="filter-item">
+            <label>Generate Report</label>
+            <button class="btn" onclick="generateReport()">Generate Report</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts Section -->
+      <div class="card">
+        <h3>Employee Distribution by Department</h3>
+        <div class="chart-container">
+          <div class="chart-placeholder">
+            📊 Chart will be displayed here<br>
+            <small>Select filters and generate report to view data visualization</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Budget Overview -->
+      <div class="card">
+        <h3>Budget Overview</h3>
+        <div class="chart-container">
+          <div class="chart-placeholder">
+            💰 Budget chart will be displayed here<br>
+            <small>Generate budget report to view spending analysis</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Reports -->
+      <div class="card">
+        <h3>Recent Reports</h3>
+        <div id="reportsList">
+          <div class="report-item">
+            <div class="report-info">
+              <h4>Monthly Employee Overview - December 2024</h4>
+              <div class="report-meta">Generated: Dec 15, 2024 • Type: Employee Overview • Department: All</div>
+            </div>
+            <div class="report-actions">
+              <button class="btn btn-secondary" onclick="downloadReport('report1')">Download PDF</button>
+              <button class="btn btn-secondary" onclick="viewReport('report1')">View</button>
+            </div>
+          </div>
+          
+          <div class="report-item">
+            <div class="report-info">
+              <h4>Q4 Budget Analysis Report</h4>
+              <div class="report-meta">Generated: Dec 10, 2024 • Type: Budget Analysis • Department: All</div>
+            </div>
+            <div class="report-actions">
+              <button class="btn btn-secondary" onclick="downloadReport('report2')">Download PDF</button>
+              <button class="btn btn-secondary" onclick="viewReport('report2')">View</button>
+            </div>
+          </div>
+          
+          <div class="report-item">
+            <div class="report-info">
+              <h4>Engineering Team Performance - November 2024</h4>
+              <div class="report-meta">Generated: Dec 5, 2024 • Type: Performance Metrics • Department: Engineering</div>
+            </div>
+            <div class="report-actions">
+              <button class="btn btn-secondary" onclick="downloadReport('report3')">Download PDF</button>
+              <button class="btn btn-secondary" onclick="viewReport('report3')">View</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scheduled Reports -->
+      <div class="card">
+        <h3>Scheduled Reports</h3>
+        <div id="scheduledReports">
+          <div class="report-item">
+            <div class="report-info">
+              <h4>Weekly Employee Attendance Report</h4>
+              <div class="report-meta">Schedule: Every Monday • Recipients: HR Team • Status: Active</div>
+            </div>
+            <div class="report-actions">
+              <button class="btn btn-secondary" onclick="editSchedule('schedule1')">Edit</button>
+              <button class="btn btn-secondary" onclick="pauseSchedule('schedule1')">Pause</button>
+            </div>
+          </div>
+          
+          <div class="report-item">
+            <div class="report-info">
+              <h4>Monthly Budget Summary</h4>
+              <div class="report-meta">Schedule: 1st of every month • Recipients: Management • Status: Active</div>
+            </div>
+            <div class="report-actions">
+              <button class="btn btn-secondary" onclick="editSchedule('schedule2')">Edit</button>
+              <button class="btn btn-secondary" onclick="pauseSchedule('schedule2')">Pause</button>
+            </div>
+          </div>
+        </div>
+        
+        <div style="margin-top: 16px;">
+          <button class="btn" onclick="createScheduledReport()">Create New Scheduled Report</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // ===== AUTHENTICATION & SECURITY =====
+    
+    // Check if user is logged in and has HR role
+    function checkAuth() {
+      const isLoggedIn = localStorage.getItem('isLoggedIn');
+      const userRole = localStorage.getItem('userRole');
+      const userEmail = localStorage.getItem('userEmail');
+      
+      if (!isLoggedIn || userRole !== 'hr') {
+        // Redirect to login if not authenticated or not HR
+        window.location.href = '/login';
+        return false;
+      }
+      
+      // Update user info in the UI
+      if (userEmail) {
+        document.getElementById('userEmail').textContent = userEmail;
+        // Extract name from email
+        const name = userEmail.split('@')[0];
+        document.getElementById('userName').textContent = name.charAt(0).toUpperCase() + name.slice(1);
+      }
+      
+      return true;
+    }
+    
+    // Logout functionality
+    document.getElementById('logoutBtn').addEventListener('click', function() {
+      localStorage.removeItem('isLoggedIn');
+      localStorage.removeItem('userRole');
+      localStorage.removeItem('userEmail');
+      window.location.href = '/redirect';
+    });
+    
+    // Reporting Functions
+    function generateReport() {
+      const reportType = document.getElementById('reportType').value;
+      const department = document.getElementById('department').value;
+      const dateRange = document.getElementById('dateRange').value;
+      
+      if (!reportType) {
+        alert('Please select a report type.');
+        return;
+      }
+      
+      console.log('Generating report:', { reportType, department, dateRange });
+      
+      // Simulate report generation
+      alert('Report generation started! This may take a few moments.');
+      
+      // In a real app, this would trigger a server-side report generation
+      setTimeout(() => {
+        alert('Report generated successfully! Check the Recent Reports section.');
+        
+        // Add new report to the list
+        const newReport = createReportElement(reportType, department, dateRange);
+        document.getElementById('reportsList').insertBefore(newReport, document.getElementById('reportsList').firstChild);
+      }, 2000);
+    }
+    
+    function downloadReport(reportId) {
+      console.log('Downloading report:', reportId);
+      // In a real app, this would trigger a file download
+      alert('Report download started!');
+    }
+    
+    function viewReport(reportId) {
+      console.log('Viewing report:', reportId);
+      // In a real app, this would show the report in a modal or new tab
+      alert('Report viewer would open here');
+    }
+    
+    function editSchedule(scheduleId) {
+      console.log('Editing schedule:', scheduleId);
+      // In a real app, this would open a schedule editing modal
+      alert('Schedule editor would open here');
+    }
+    
+    function pauseSchedule(scheduleId) {
+      console.log('Pausing schedule:', scheduleId);
+      // In a real app, this would pause the scheduled report
+      alert('Schedule paused successfully!');
+    }
+    
+    function createScheduledReport() {
+      // In a real app, this would open a form to create a new scheduled report
+      alert('Scheduled report creation form would open here');
+    }
+    
+    function createReportElement(type, department, dateRange) {
+      const reportDiv = document.createElement('div');
+      reportDiv.className = 'report-item';
+      
+      const typeNames = {
+        'employee': 'Employee Overview',
+        'budget': 'Budget Analysis',
+        'performance': 'Performance Metrics',
+        'attendance': 'Attendance Report',
+        'custom': 'Custom Report'
+      };
+      
+      const deptNames = {
+        'all': 'All Departments',
+        'engineering': 'Engineering',
+        'marketing': 'Marketing',
+        'sales': 'Sales',
+        'hr': 'HR',
+        'finance': 'Finance'
+      };
+      
+      reportDiv.innerHTML = `
+        <div class="report-info">
+          <h4>${typeNames[type]} - ${deptNames[department]} - ${dateRange}</h4>
+          <div class="report-meta">Generated: ${new Date().toLocaleDateString()} • Type: ${typeNames[type]} • Department: ${deptNames[department]}</div>
+        </div>
+        <div class="report-actions">
+          <button class="btn btn-secondary" onclick="downloadReport('newReport')">Download PDF</button>
+          <button class="btn btn-secondary" onclick="viewReport('newReport')">View</button>
+        </div>
+      `;
+      return reportDiv;
+    }
+    
+    // Check authentication on page load
+    if (!checkAuth()) {
+      // Stop execution if not authenticated
+      throw new Error('Authentication failed');
+    }
+  </script>
+</body>
+</html>

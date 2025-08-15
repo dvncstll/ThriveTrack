@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Employee Profile - ThriveTrack</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f4f7f8;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --line: #e5e7eb;
+      --teal-50:#e6fbf7; --teal-200:#b7d7d2; --teal-600:#2c6d62;
+      --green-50:#ecfdf5; --green-600:#059669;
+      --cyan-50:#e6fafe; --cyan-600:#0891b2;
+      --amber-50:#fff7ed; --amber-600:#d97706;
+      --rose-50:#fef2f2; --rose-600:#dc2626;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+    }
+    .shell {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 960px) {
+      .shell { grid-template-columns: 260px minmax(0,1fr); }
+    }
+
+    /* Sidebar */
+    .sidebar {
+      display: none;
+    }
+    @media (min-width: 960px) {
+      .sidebar {
+        display: flex;
+        position: sticky; top: 0; height: 100vh;
+        flex-direction: column; gap: 14px;
+        background: var(--card);
+        border-right: 1px solid var(--line);
+        padding: 16px;
+      }
+    }
+    .profile {
+      display: flex; gap: 12px; align-items: center;
+      background: #f8fafc; border-radius: 16px; padding: 12px;
+    }
+    .avatar { width: 40px; height: 40px; border-radius: 999px; background: linear-gradient(135deg,#14b8a6,#0f766e); }
+    .muted { color: var(--muted); }
+    .nav .nav-link {
+      width: 100%; text-align: left;
+      padding: 10px 12px; border: 0; background: transparent; cursor: pointer;
+      border-radius: 12px; color: #0f172a; font-size: 14px;
+      text-decoration: none; display: block; transition: all 0.2s;
+    }
+    .nav .nav-link:hover { background: #f8fafc; }
+    .nav .nav-link.active { background: #eef2f7; font-weight: 600; }
+    .logout {
+      margin-top: auto; width: 100%; border: 1px solid var(--line); background: #fff;
+      padding: 10px 12px; border-radius: 12px; cursor: pointer;
+    }
+
+    /* Main */
+    main { padding: 16px; }
+    @media (min-width: 960px) { main { padding: 32px; } }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .welcome {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--teal-600);
+    }
+    .subtitle {
+      color: var(--muted);
+      font-size: 16px;
+    }
+    
+    .card { 
+      background: var(--card); 
+      border: 1px solid var(--line); 
+      border-radius: 16px; 
+      padding: 24px; 
+      box-shadow: 0 1px 2px rgba(0,0,0,.04); 
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .card h3 { margin: 0 0 16px; font-size: 18px; font-weight: 600; }
+    
+    .btn {
+      background: var(--teal-600);
+      color: white;
+      border: 0;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    .btn:hover {
+      background: var(--teal-700);
+      transform: translateY(-1px);
+    }
+    .btn-secondary {
+      background: var(--muted);
+    }
+    .btn-secondary:hover {
+      background: #475569;
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="profile">
+        <div class="avatar"></div>
+        <div>
+          <div style="font-weight:600" id="sidebarUserName">Sarah</div>
+          <div class="muted" style="font-size:12px" id="sidebarUserEmail">sarah@company.com</div>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <a href="/employee-dashboard" class="nav-link">📊 Dashboard</a>
+        <a href="/employee-profile" class="nav-link active">👤 Profile</a>
+        <a href="/employee-leave" class="nav-link">📋 Leave & Attendance</a>
+        <a href="/employee-workload" class="nav-link">⚖️ Workload Assessment</a>
+        <a href="/employee-feedback" class="nav-link">💬 Anonymous Feedback</a>
+        <a href="/employee-actions" class="nav-link">⚡ Quick Actions</a>
+        <a href="/employee-announcements" class="nav-link">📢 Announcements</a>
+      </nav>
+
+      <button class="logout" id="sidebarLogoutBtn">Logout</button>
+    </aside>
+
+    <!-- Main Content -->
+    <main>
+      <!-- Header with User Info -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding: 16px; background: var(--card); border-radius: 12px; border: 1px solid var(--line);">
+        <div>
+          <div style="font-size: 14px; color: var(--muted); margin-bottom: 4px;">Welcome back</div>
+          <div style="font-size: 18px; font-weight: 600; color: var(--teal-600);" id="userName">Sarah</div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="font-size: 14px; color: var(--muted);" id="userEmail">sarah@company.com</div>
+          <button class="btn btn-secondary" id="logoutBtn" style="padding: 8px 16px; font-size: 12px;">Logout</button>
+        </div>
+      </div>
+
+      <!-- Header -->
+      <div class="header">
+        <div class="welcome">My Profile</div>
+        <div class="subtitle">Manage your personal information and preferences</div>
+      </div>
+
+      <!-- Profile Section -->
+      <div class="card">
+        <h3>Personal Information</h3>
+        <div style="display: grid; gap: 16px;">
+          <div style="display: flex; align-items: center; gap: 16px;">
+            <div style="width: 60px; height: 60px; background: linear-gradient(135deg, var(--teal-600), var(--cyan-600)); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: 600;" id="profileInitials">S</div>
+            <div>
+              <div style="font-size: 18px; font-weight: 600; margin-bottom: 4px;" id="profileName">Sarah Johnson</div>
+              <div style="font-size: 14px; color: var(--muted);" id="profilePosition">Software Developer</div>
+            </div>
+          </div>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div>
+              <div style="font-size: 12px; color: var(--muted); margin-bottom: 4px;">Department</div>
+              <div style="font-size: 14px; font-weight: 500;" id="profileDepartment">Engineering</div>
+            </div>
+            <div>
+              <div style="font-size: 12px; color: var(--muted); margin-bottom: 4px;">Employee ID</div>
+              <div style="font-size: 14px; font-weight: 500;" id="profileId">EMP-2024-001</div>
+            </div>
+            <div>
+              <div style="font-size: 12px; color: var(--muted); margin-bottom: 4px;">Email</div>
+              <div style="font-size: 14px; font-weight: 500;" id="profileEmail">sarah@company.com</div>
+            </div>
+            <div>
+              <div style="font-size: 12px; color: var(--muted); margin-bottom: 4px;">Phone</div>
+              <div style="font-size: 14px; font-weight: 500;" id="profilePhone">+1 (555) 123-4567</div>
+            </div>
+          </div>
+          
+          <button class="btn btn-secondary" onclick="editProfile()" style="margin-top: 8px;">✏️ Edit Profile</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // ===== AUTHENTICATION & SECURITY =====
+    
+    // Check if user is logged in and has employee role
+    function checkAuth() {
+      const isLoggedIn = localStorage.getItem('isLoggedIn');
+      const userRole = localStorage.getItem('userRole');
+      const userEmail = localStorage.getItem('userEmail');
+      
+      if (!isLoggedIn || userRole !== 'employee') {
+        // Redirect to login if not authenticated or not employee
+        window.location.href = '/login';
+        return false;
+      }
+      
+      // Update user info in the UI
+      if (userEmail) {
+        document.getElementById('userEmail').textContent = userEmail;
+        // Extract name from email
+        const name = userEmail.split('@')[0];
+        const displayName = name.charAt(0).toUpperCase() + name.slice(1);
+        document.getElementById('userName').textContent = displayName;
+        
+        // Update profile section
+        const profileName = document.getElementById('profileName');
+        const profileEmail = document.getElementById('profileEmail');
+        const profileInitials = document.getElementById('profileInitials');
+        
+        if (profileName) profileName.textContent = displayName + ' Johnson';
+        if (profileEmail) profileEmail.textContent = userEmail;
+        if (profileInitials) profileInitials.textContent = displayName.charAt(0);
+        
+        // Update sidebar user info
+        document.getElementById('sidebarUserName').textContent = displayName;
+        document.getElementById('sidebarUserEmail').textContent = userEmail;
+      }
+      
+      return true;
+    }
+    
+    // Logout functionality
+    document.getElementById('logoutBtn').addEventListener('click', function() {
+      localStorage.removeItem('isLoggedIn');
+      localStorage.removeItem('userRole');
+      localStorage.removeItem('userEmail');
+      window.location.href = '/redirect';
+    });
+    
+    // Sidebar logout functionality
+    document.getElementById('sidebarLogoutBtn').addEventListener('click', function() {
+      localStorage.removeItem('isLoggedIn');
+      localStorage.removeItem('userRole');
+      localStorage.removeItem('userEmail');
+      window.location.href = '/redirect';
+    });
+    
+    // Check authentication on page load
+    if (!checkAuth()) {
+      // Stop execution if not authenticated
+      throw new Error('Authentication failed');
+    }
+
+    // Profile Management
+    function editProfile() {
+      const modal = createModal('Edit Profile', `
+        <form id="profileForm" style="display: grid; gap: 16px;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div>
+              <label style="font-size: 14px; color: var(--muted); display: block; margin-bottom: 8px;">First Name</label>
+              <input type="text" id="editFirstName" value="Sarah" style="width: 100%; padding: 12px; border: 1px solid var(--line); border-radius: 8px; font-size: 14px;">
+            </div>
+            <div>
+              <label style="font-size: 14px; color: var(--muted); display: block; margin-bottom: 8px;">Last Name</label>
+              <input type="text" id="editLastName" value="Johnson" style="width: 100%; padding: 12px; border: 1px solid var(--line); border-radius: 8px; font-size: 14px;">
+            </div>
+          </div>
+          <div>
+            <label style="font-size: 14px; color: var(--muted); display: block; margin-bottom: 8px;">Position</label>
+            <input type="text" id="editPosition" value="Software Developer" style="width: 100%; padding: 12px; border: 1px solid var(--line); border-radius: 8px; font-size: 14px;">
+          </div>
+          <div>
+            <label style="font-size: 14px; color: var(--muted); display: block; margin-bottom: 8px;">Department</label>
+            <select id="editDepartment" style="width: 100%; padding: 12px; border: 1px solid var(--line); border-radius: 8px; font-size: 14px;">
+              <option value="Engineering" selected>Engineering</option>
+              <option value="Marketing">Marketing</option>
+              <option value="Sales">Sales</option>
+              <option value="HR">HR</option>
+              <option value="Finance">Finance</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size: 14px; color: var(--muted); display: block; margin-bottom: 8px;">Phone Number</label>
+            <input type="tel" id="editPhone" value="+1 (555) 123-4567" style="width: 100%; padding: 12px; border: 1px solid var(--line); border-radius: 8px; font-size: 14px;">
+          </div>
+          <div style="display: flex; gap: 8px; justify-content: flex-end;">
+            <button type="button" onclick="closeModal()" style="background: var(--muted); color: white; border: 0; padding: 12px 24px; border-radius: 8px; cursor: pointer;">Cancel</button>
+            <button type="submit" style="background: var(--teal-600); color: white; border: 0; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: 500;">Save Changes</button>
+          </div>
+        </form>
+      `);
+      
+      // Handle form submission
+      document.getElementById('profileForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = {
+          firstName: document.getElementById('editFirstName').value,
+          lastName: document.getElementById('editLastName').value,
+          position: document.getElementById('editPosition').value,
+          department: document.getElementById('editDepartment').value,
+          phone: document.getElementById('editPhone').value
+        };
+        
+        // Update the profile display
+        const profileName = document.getElementById('profileName');
+        const profilePosition = document.getElementById('profilePosition');
+        const profileDepartment = document.getElementById('profileDepartment');
+        const profilePhone = document.getElementById('profilePhone');
+        const profileInitials = document.getElementById('profileInitials');
+        
+        if (profileName) profileName.textContent = formData.firstName + ' ' + formData.lastName;
+        if (profilePosition) profilePosition.textContent = formData.position;
+        if (profileDepartment) profileDepartment.textContent = formData.department;
+        if (profilePhone) profilePhone.textContent = formData.phone;
+        if (profileInitials) profileInitials.textContent = formData.firstName.charAt(0);
+        
+        closeModal();
+        showNotification('Profile updated successfully!', 'success');
+        console.log('Profile updated:', formData);
+      });
+    }
+
+    // Utility Functions
+    function createModal(title, content) {
+      // Remove existing modal if any
+      const existingModal = document.querySelector('.modal-overlay');
+      if (existingModal) {
+        existingModal.remove();
+      }
+      
+      const modal = document.createElement('div');
+      modal.className = 'modal-overlay';
+      modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      `;
+      
+      modal.innerHTML = `
+        <div style="background: white; padding: 24px; border-radius: 12px; max-width: 500px; width: 100%; max-height: 80vh; overflow-y: auto;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 style="margin: 0; color: var(--teal-600);">${title}</h3>
+            <button onclick="closeModal()" style="background: none; border: 0; font-size: 24px; cursor: pointer; color: var(--muted);">&times;</button>
+          </div>
+          ${content}
+        </div>
+      `;
+      
+      document.body.appendChild(modal);
+      return modal;
+    }
+    
+    function closeModal() {
+      const modal = document.querySelector('.modal-overlay');
+      if (modal) {
+        modal.remove();
+      }
+    }
+    
+    function showNotification(message, type = 'success') {
+      const notification = document.createElement('div');
+      notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${type === 'success' ? 'var(--green-600)' : 'var(--rose-600)'};
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        z-index: 1001;
+        font-size: 14px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      `;
+      notification.textContent = message;
+      
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.remove();
+      }, 3000);
+    }
+  </script>
+</body>
+</html>

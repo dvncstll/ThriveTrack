@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HR Orders - ThriveTrack</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f4f7f8;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --line: #e5e7eb;
+      --teal-50:#e6fbf7; --teal-200:#b7d7d2; --teal-600:#2c6d62;
+      --green-50:#ecfdf5; --green-600:#059669;
+      --cyan-50:#e6fafe; --cyan-600:#0891b2;
+      --amber-50:#fff7ed; --amber-600:#d97706;
+      --rose-50:#fef2f2; --rose-600:#dc2626;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+    }
+    .shell {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 960px) {
+      .shell { grid-template-columns: 260px minmax(0,1fr); }
+    }
+
+    /* Sidebar */
+    .sidebar {
+      display: none;
+    }
+    @media (min-width: 960px) {
+      .sidebar {
+        display: flex;
+        position: sticky; top: 0; height: 100vh;
+        flex-direction: column; gap: 14px;
+        background: var(--card);
+        border-right: 1px solid var(--line);
+        padding: 16px;
+      }
+    }
+    .profile {
+      display: flex; gap: 12px; align-items: center;
+      background: #f8fafc; border-radius: 16px; padding: 12px;
+    }
+    .avatar { width: 40px; height: 40px; border-radius: 999px; background: linear-gradient(135deg,#14b8a6,#0f766e); }
+    .muted { color: var(--muted); }
+    .nav .nav-link {
+      width: 100%; text-align: left;
+      padding: 10px 12px; border: 0; background: transparent; cursor: pointer;
+      border-radius: 12px; color: #0f172a; font-size: 14px;
+      text-decoration: none; display: block; transition: all 0.2s;
+    }
+    .nav .nav-link:hover { background: #f8fafc; }
+    .nav .nav-link.active { background: #eef2f7; font-weight: 600; }
+    .logout {
+      margin-top: auto; width: 100%; border: 1px solid var(--line); background: #fff;
+      padding: 10px 12px; border-radius: 12px; cursor: pointer;
+    }
+
+    /* Main */
+    main { padding: 16px; }
+    @media (min-width: 960px) { main { padding: 32px; } }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .welcome {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--teal-600);
+    }
+    .subtitle {
+      color: var(--muted);
+      font-size: 16px;
+    }
+    
+    .card { 
+      background: var(--card); 
+      border: 1px solid var(--line); 
+      border-radius: 16px; 
+      padding: 24px; 
+      box-shadow: 0 1px 2px rgba(0,0,0,.04); 
+      margin-bottom: 24px;
+    }
+    .card h3 { margin: 0 0 16px; font-size: 18px; font-weight: 600; }
+    
+    .btn {
+      background: var(--teal-600);
+      color: white;
+      border: 0;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    .btn:hover {
+      background: var(--teal-700);
+      transform: translateY(-1px);
+    }
+    .btn-secondary {
+      background: var(--muted);
+    }
+    .btn-secondary:hover {
+      background: #475569;
+    }
+    
+    .badge { 
+      font-size: 12px; 
+      padding: 4px 8px; 
+      border-radius: 999px; 
+      border: 1px solid var(--line); 
+    }
+    .status-pending { background: var(--amber-50); color: #7c2d12; border-color: #fed7aa; }
+    .status-approved { background: var(--green-50); color: #065f46; border-color: #bbf7d0; }
+    .status-rejected { background: var(--rose-50); color: #991b1b; border-color: #fecaca; }
+    
+    .order-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 16px; background: #f8fafc; border-radius: 8px; margin-bottom: 12px;
+      border-left: 3px solid var(--teal-600);
+    }
+    .order-info h4 { margin: 0 0 4px; font-size: 14px; }
+    .order-meta { font-size: 12px; color: var(--muted); }
+    .order-actions { display: flex; gap: 8px; }
+    
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;
+    }
+    .stat-card {
+      background: var(--card); padding: 20px; border-radius: 12px; text-align: center;
+      border: 1px solid var(--line);
+    }
+    .stat-value { font-size: 32px; font-weight: 700; color: var(--teal-600); margin-bottom: 8px; }
+    .stat-label { font-size: 14px; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="profile">
+        <div class="avatar"></div>
+        <div>
+          <div style="font-weight:600" id="userName">Nirmal Kumar P</div>
+          <div class="muted" style="font-size:12px" id="userEmail">nirmalcom.job@gmail.com</div>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <a href="/" class="nav-link">Dashboard</a>
+        <a href="/hr-inventory" class="nav-link">Inventory</a>
+        <a href="/hr-orders" class="nav-link active">Orders</a>
+        <a href="/hr-purchase" class="nav-link">Purchase</a>
+        <a href="/hr-reporting" class="nav-link">Reporting</a>
+        <a href="/hr-support" class="nav-link">Support</a>
+        <a href="/hr-settings" class="nav-link">Settings</a>
+      </nav>
+
+      <button class="logout" id="logoutBtn">Logout</button>
+    </aside>
+
+    <!-- Main Content -->
+    <main>
+      <!-- Header -->
+      <div class="header">
+        <div class="welcome">HR Orders Management</div>
+        <div class="subtitle">Manage employee requests and company orders</div>
+      </div>
+
+      <!-- Stats Overview -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value">24</div>
+          <div class="stat-label">Pending Orders</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">156</div>
+          <div class="stat-label">Approved This Month</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">8</div>
+          <div class="stat-label">Rejected Orders</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">$12.5K</div>
+          <div class="stat-label">Total Spent</div>
+        </div>
+      </div>
+
+      <!-- Recent Orders -->
+      <div class="card">
+        <h3>Recent Orders</h3>
+        <div id="ordersList">
+          <div class="order-item">
+            <div class="order-info">
+              <h4>Office Supplies - Team A</h4>
+              <div class="order-meta">Requested by: John Smith • Department: Engineering • Date: Dec 15, 2024</div>
+            </div>
+            <div class="order-actions">
+              <span class="badge status-pending">Pending</span>
+              <button class="btn btn-secondary" onclick="approveOrder('order1')">Approve</button>
+              <button class="btn btn-secondary" onclick="rejectOrder('order1')">Reject</button>
+            </div>
+          </div>
+          
+          <div class="order-item">
+            <div class="order-info">
+              <h4>New Laptops - IT Department</h4>
+              <div class="order-meta">Requested by: Sarah Johnson • Department: IT • Date: Dec 14, 2024</div>
+            </div>
+            <div class="order-actions">
+              <span class="badge status-approved">Approved</span>
+              <button class="btn btn-secondary" onclick="viewOrder('order2')">View Details</button>
+            </div>
+          </div>
+          
+          <div class="order-item">
+            <div class="order-info">
+              <h4>Training Materials - HR Team</h4>
+              <div class="order-meta">Requested by: Mike Wilson • Department: HR • Date: Dec 13, 2024</div>
+            </div>
+            <div class="order-actions">
+              <span class="badge status-rejected">Rejected</span>
+              <button class="btn btn-secondary" onclick="viewOrder('order3')">View Details</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Create New Order -->
+      <div class="card">
+        <h3>Create New Order</h3>
+        <form id="newOrderForm" style="display: grid; gap: 16px;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div>
+              <label style="font-size: 14px; color: var(--muted); display: block; margin-bottom: 8px;">Order Type</label>
+              <select id="orderType" style="width: 100%; padding: 12px; border: 1px solid var(--line); border-radius: 8px; font-size: 14px;">
+                <option value="">Select order type</option>
+                <option value="equipment">Equipment</option>
+                <option value="supplies">Office Supplies</option>
+                <option value="software">Software Licenses</option>
+                <option value="training">Training Materials</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size: 14px; color: var(--muted); display: block; margin-bottom: 8px;">Priority</label>
+              <select id="orderPriority" style="width: 100%; padding: 12px; border: 1px solid var(--line); border-radius: 8px; font-size: 14px;">
+                <option value="low">Low</option>
+                <option value="medium" selected>Medium</option>
+                <option value="high">High</option>
+                <option value="urgent">Urgent</option>
+              </select>
+            </div>
+          </div>
+          
+          <div>
+            <label style="font-size: 14px; color: var(--muted); display: block; margin-bottom: 8px;">Description</label>
+            <textarea id="orderDescription" placeholder="Describe what you need to order..." style="width: 100%; padding: 12px; border: 1px solid var(--line); border-radius: 8px; font-size: 14px; resize: vertical; min-height: 80px;"></textarea>
+          </div>
+          
+          <div style="display: flex; gap: 8px; justify-content: flex-end;">
+            <button type="button" onclick="clearForm()" style="background: var(--muted); color: white; border: 0; padding: 12px 24px; border-radius: 8px; cursor: pointer;">Clear</button>
+            <button type="submit" class="btn">Create Order</button>
+          </div>
+        </form>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // ===== AUTHENTICATION & SECURITY =====
+    
+    // Check if user is logged in and has HR role
+    function checkAuth() {
+      const isLoggedIn = localStorage.getItem('isLoggedIn');
+      const userRole = localStorage.getItem('userRole');
+      const userEmail = localStorage.getItem('userEmail');
+      
+      if (!isLoggedIn || userRole !== 'hr') {
+        // Redirect to login if not authenticated or not HR
+        window.location.href = '/login';
+        return false;
+      }
+      
+      // Update user info in the UI
+      if (userEmail) {
+        document.getElementById('userEmail').textContent = userEmail;
+        // Extract name from email
+        const name = userEmail.split('@')[0];
+        document.getElementById('userName').textContent = name.charAt(0).toUpperCase() + name.slice(1);
+      }
+      
+      return true;
+    }
+    
+    // Logout functionality
+    document.getElementById('logoutBtn').addEventListener('click', function() {
+      localStorage.removeItem('isLoggedIn');
+      localStorage.removeItem('userRole');
+      localStorage.removeItem('userEmail');
+      window.location.href = '/redirect';
+    });
+    
+    // Order Management Functions
+    function approveOrder(orderId) {
+      console.log('Approving order:', orderId);
+      // In a real app, this would send a request to the server
+      alert('Order approved successfully!');
+      // Update the UI to show approved status
+      const orderElement = document.querySelector(`[onclick*="${orderId}"]`).closest('.order-item');
+      const badge = orderElement.querySelector('.badge');
+      badge.textContent = 'Approved';
+      badge.className = 'badge status-approved';
+      
+      // Update stats
+      updateStats();
+    }
+    
+    function rejectOrder(orderId) {
+      console.log('Rejecting order:', orderId);
+      // In a real app, this would send a request to the server
+      alert('Order rejected successfully!');
+      // Update the UI to show rejected status
+      const orderElement = document.querySelector(`[onclick*="${orderId}"]`).closest('.order-item');
+      const badge = orderElement.querySelector('.badge');
+      badge.textContent = 'Rejected';
+      badge.className = 'badge status-rejected';
+      
+      // Update stats
+      updateStats();
+    }
+    
+    function viewOrder(orderId) {
+      console.log('Viewing order:', orderId);
+      // In a real app, this would show order details in a modal or navigate to detail page
+      alert('Order details would be displayed here');
+    }
+    
+    function clearForm() {
+      document.getElementById('newOrderForm').reset();
+    }
+    
+    function updateStats() {
+      // Update the stats display based on current orders
+      const pendingOrders = document.querySelectorAll('.badge.status-pending').length;
+      const approvedOrders = document.querySelectorAll('.badge.status-approved').length;
+      const rejectedOrders = document.querySelectorAll('.badge.status-rejected').length;
+      
+      // Update the stats display
+      document.querySelector('.stats-grid .stat-card:nth-child(1) .stat-value').textContent = pendingOrders;
+      document.querySelector('.stats-grid .stat-card:nth-child(3) .stat-value').textContent = rejectedOrders;
+    }
+    
+    // Handle new order form submission
+    document.getElementById('newOrderForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const orderType = document.getElementById('orderType').value;
+      const orderPriority = document.getElementById('orderPriority').value;
+      const orderDescription = document.getElementById('orderDescription').value;
+      
+      if (!orderType || !orderDescription.trim()) {
+        alert('Please fill in all required fields.');
+        return;
+      }
+      
+      // Create new order item
+      const newOrder = createOrderElement(orderType, orderPriority, orderDescription);
+      document.getElementById('ordersList').insertBefore(newOrder, document.getElementById('ordersList').firstChild);
+      
+      // Clear form
+      clearForm();
+      
+      // Update stats
+      updateStats();
+      
+      alert('Order created successfully!');
+    });
+    
+    function createOrderElement(type, priority, description) {
+      const orderDiv = document.createElement('div');
+      orderDiv.className = 'order-item';
+      orderDiv.innerHTML = `
+        <div class="order-info">
+          <h4>${type.charAt(0).toUpperCase() + type.slice(1)} - New Request</h4>
+          <div class="order-meta">Requested by: You • Department: HR • Date: ${new Date().toLocaleDateString()}</div>
+        </div>
+        <div class="order-actions">
+          <span class="badge status-pending">Pending</span>
+          <button class="btn btn-secondary" onclick="approveOrder('newOrder')">Approve</button>
+          <button class="btn btn-secondary" onclick="rejectOrder('newOrder')">Reject</button>
+        </div>
+      `;
+      return orderDiv;
+    }
+    
+    // Check authentication on page load
+    if (!checkAuth()) {
+      // Stop execution if not authenticated
+      throw new Error('Authentication failed');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HR Settings - ThriveTrack</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f4f7f8;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --line: #e5e7eb;
+      --teal-50:#e6fbf7; --teal-200:#b7d7d2; --teal-600:#2c6d62;
+      --green-50:#ecfdf5; --green-600:#059669;
+      --cyan-50:#e6fafe; --cyan-600:#0891b2;
+      --amber-50:#fff7ed; --amber-600:#d97706;
+      --rose-50:#fef2f2; --rose-600:#dc2626;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+    }
+    .shell {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 960px) {
+      .shell { grid-template-columns: 260px minmax(0,1fr); }
+    }
+
+    /* Sidebar */
+    .sidebar {
+      display: none;
+    }
+    @media (min-width: 960px) {
+      .sidebar {
+        display: flex;
+        position: sticky; top: 0; height: 100vh;
+        flex-direction: column; gap: 14px;
+        background: var(--card);
+        border-right: 1px solid var(--line);
+        padding: 16px;
+      }
+    }
+    .profile {
+      display: flex; gap: 12px; align-items: center;
+      background: #f8fafc; border-radius: 16px; padding: 12px;
+    }
+    .avatar { width: 40px; height: 40px; border-radius: 999px; background: linear-gradient(135deg,#14b8a6,#0f766e); }
+    .muted { color: var(--muted); }
+    .nav .nav-link {
+      width: 100%; text-align: left;
+      padding: 10px 12px; border: 0; background: transparent; cursor: pointer;
+      border-radius: 12px; color: #0f172a; font-size: 14px;
+      text-decoration: none; display: block; transition: all 0.2s;
+    }
+    .nav .nav-link:hover { background: #f8fafc; }
+    .nav .nav-link.active { background: #eef2f7; font-weight: 600; }
+    .logout {
+      margin-top: auto; width: 100%; border: 1px solid var(--line); background: #fff;
+      padding: 10px 12px; border-radius: 12px; cursor: pointer;
+    }
+
+    /* Main */
+    main { padding: 16px; }
+    @media (min-width: 960px) { main { padding: 32px; } }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .welcome {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--teal-600);
+    }
+    .subtitle {
+      color: var(--muted);
+      font-size: 16px;
+    }
+    
+    .card { 
+      background: var(--card); 
+      border: 1px solid var(--line); 
+      border-radius: 16px; 
+      padding: 24px; 
+      box-shadow: 0 1px 2px rgba(0,0,0,.04); 
+      margin-bottom: 24px;
+    }
+    .card h3 { margin: 0 0 16px; font-size: 18px; font-weight: 600; }
+    
+    .btn {
+      background: var(--teal-600);
+      color: white;
+      border: 0;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    .btn:hover {
+      background: var(--teal-700);
+      transform: translateY(-1px);
+    }
+    .btn-secondary {
+      background: var(--muted);
+    }
+    .btn-secondary:hover {
+      background: #475569;
+    }
+    
+    .settings-section {
+      margin-bottom: 24px;
+    }
+    .settings-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 16px; background: #f8fafc; border-radius: 8px; margin-bottom: 12px;
+      border: 1px solid var(--line);
+    }
+    .settings-info h4 { margin: 0 0 4px; font-size: 14px; }
+    .settings-desc { font-size: 12px; color: var(--muted); }
+    .settings-control { display: flex; gap: 8px; align-items: center; }
+    
+    .toggle-switch {
+      position: relative; display: inline-block; width: 50px; height: 24px;
+    }
+    .toggle-switch input {
+      opacity: 0; width: 0; height: 0;
+    }
+    .slider {
+      position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #ccc; transition: .4s; border-radius: 24px;
+    }
+    .slider:before {
+      position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px;
+      background-color: white; transition: .4s; border-radius: 50%;
+    }
+    input:checked + .slider { background-color: var(--teal-600); }
+    input:checked + .slider:before { transform: translateX(26px); }
+    
+    .form-group {
+      margin-bottom: 16px;
+    }
+    .form-group label {
+      display: block; margin-bottom: 8px; font-size: 14px; color: var(--muted); font-weight: 500;
+    }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%; padding: 12px; border: 1px solid var(--line); border-radius: 8px; font-size: 14px;
+    }
+    .form-group textarea {
+      resize: vertical; min-height: 80px;
+    }
+    
+    .notification-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px; background: #f8fafc; border-radius: 6px; margin-bottom: 8px;
+      border: 1px solid var(--line);
+    }
+    .notification-info h5 { margin: 0; font-size: 13px; }
+    .notification-desc { font-size: 11px; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="profile">
+        <div class="avatar"></div>
+        <div>
+          <div style="font-weight:600" id="userName">Nirmal Kumar P</div>
+          <div class="muted" style="font-size:12px" id="userEmail">nirmalcom.job@gmail.com</div>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <a href="/" class="nav-link">Dashboard</a>
+        <a href="/hr-inventory" class="nav-link">Inventory</a>
+        <a href="/hr-orders" class="nav-link">Orders</a>
+        <a href="/hr-purchase" class="nav-link">Purchase</a>
+        <a href="/hr-reporting" class="nav-link">Reporting</a>
+        <a href="/hr-support" class="nav-link">Support</a>
+        <a href="/hr-settings" class="nav-link active">Settings</a>
+      </nav>
+
+      <button class="logout" id="logoutBtn">Logout</button>
+    </aside>
+
+    <!-- Main Content -->
+    <main>
+      <!-- Header -->
+      <div class="header">
+        <div class="welcome">HR System Settings</div>
+        <div class="subtitle">Configure system preferences and manage user access</div>
+      </div>
+
+      <!-- General Settings -->
+      <div class="card">
+        <h3>General Settings</h3>
+        <div class="settings-section">
+          <div class="settings-item">
+            <div class="settings-info">
+              <h4>System Notifications</h4>
+              <div class="settings-desc">Receive notifications for system updates and alerts</div>
+            </div>
+            <div class="settings-control">
+              <label class="toggle-switch">
+                <input type="checkbox" id="systemNotifications" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+          
+          <div class="settings-item">
+            <div class="settings-info">
+              <h4>Auto-save Forms</h4>
+              <div class="settings-desc">Automatically save form data as you type</div>
+            </div>
+            <div class="settings-control">
+              <label class="toggle-switch">
+                <input type="checkbox" id="autoSaveForms" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+          
+          <div class="settings-item">
+            <div class="settings-info">
+              <h4>Dark Mode</h4>
+              <div class="settings-desc">Switch to dark theme for better visibility</div>
+            </div>
+            <div class="settings-control">
+              <label class="toggle-switch">
+                <input type="checkbox" id="darkMode">
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- User Management -->
+      <div class="card">
+        <h3>User Management</h3>
+        <div class="form-group">
+          <label>Default User Role</label>
+          <select id="defaultUserRole">
+            <option value="employee">Employee</option>
+            <option value="manager">Manager</option>
+            <option value="hr" selected>HR</option>
+            <option value="admin">Administrator</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>Password Policy</label>
+          <select id="passwordPolicy">
+            <option value="basic">Basic (8 characters)</option>
+            <option value="standard" selected>Standard (12 characters, mixed case)</option>
+            <option value="strict">Strict (16 characters, special chars)</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>Session Timeout (minutes)</label>
+          <input type="number" id="sessionTimeout" value="30" min="15" max="480">
+        </div>
+        
+        <div style="margin-top: 16px;">
+          <button class="btn" onclick="saveUserSettings()">Save User Settings</button>
+        </div>
+      </div>
+
+      <!-- Notification Preferences -->
+      <div class="card">
+        <h3>Notification Preferences</h3>
+        <div class="settings-section">
+          <div class="notification-item">
+            <div class="notification-info">
+              <h5>Email Notifications</h5>
+              <div class="notification-desc">Receive important updates via email</div>
+            </div>
+            <div class="settings-control">
+              <label class="toggle-switch">
+                <input type="checkbox" id="emailNotifications" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+          
+          <div class="notification-item">
+            <div class="notification-info">
+              <h5>Push Notifications</h5>
+              <div class="notification-desc">Get real-time alerts in the browser</div>
+            </div>
+            <div class="settings-control">
+              <label class="toggle-switch">
+                <input type="checkbox" id="pushNotifications" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+          
+          <div class="notification-item">
+            <div class="notification-info">
+              <h5>SMS Alerts</h5>
+              <div class="notification-desc">Receive urgent notifications via SMS</div>
+            </div>
+            <div class="settings-control">
+              <label class="toggle-switch">
+                <input type="checkbox" id="smsNotifications">
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- System Configuration -->
+      <div class="card">
+        <h3>System Configuration</h3>
+        <div class="form-group">
+          <label>Company Name</label>
+          <input type="text" id="companyName" value="ThriveTrack Inc.">
+        </div>
+        
+        <div class="form-group">
+          <label>System Language</label>
+          <select id="systemLanguage">
+            <option value="en" selected>English</option>
+            <option value="es">Spanish</option>
+            <option value="fr">French</option>
+            <option value="de">German</option>
+            <option value="zh">Chinese</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>Time Zone</label>
+          <select id="timeZone">
+            <option value="UTC">UTC</option>
+            <option value="EST" selected>Eastern Time (EST)</option>
+            <option value="CST">Central Time (CST)</option>
+            <option value="MST">Mountain Time (MST)</option>
+            <option value="PST">Pacific Time (PST)</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>Date Format</label>
+          <select id="dateFormat">
+            <option value="MM/DD/YYYY" selected>MM/DD/YYYY</option>
+            <option value="DD/MM/YYYY">DD/MM/YYYY</option>
+            <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+          </select>
+        </div>
+        
+        <div style="margin-top: 16px;">
+          <button class="btn" onclick="saveSystemSettings()">Save System Settings</button>
+        </div>
+      </div>
+
+      <!-- Data & Privacy -->
+      <div class="card">
+        <h3>Data & Privacy</h3>
+        <div class="settings-section">
+          <div class="settings-item">
+            <div class="settings-info">
+              <h4>Data Analytics</h4>
+              <div class="settings-desc">Allow anonymous usage data collection for system improvement</div>
+            </div>
+            <div class="settings-control">
+              <label class="toggle-switch">
+                <input type="checkbox" id="dataAnalytics" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+          
+          <div class="settings-item">
+            <div class="settings-info">
+              <h4>Auto-backup</h4>
+              <div class="settings-desc">Automatically backup system data daily</div>
+            </div>
+            <div class="settings-control">
+              <label class="toggle-switch">
+                <input type="checkbox" id="autoBackup" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+        
+        <div style="margin-top: 16px;">
+          <button class="btn btn-secondary" onclick="exportData()">Export Data</button>
+          <button class="btn btn-secondary" onclick="importData()">Import Data</button>
+        </div>
+      </div>
+
+      <!-- Advanced Settings -->
+      <div class="card">
+        <h3>Advanced Settings</h3>
+        <div class="form-group">
+          <label>API Rate Limit (requests per minute)</label>
+          <input type="number" id="apiRateLimit" value="100" min="50" max="1000">
+        </div>
+        
+        <div class="form-group">
+          <label>Cache Duration (seconds)</label>
+          <input type="number" id="cacheDuration" value="300" min="60" max="3600">
+        </div>
+        
+        <div class="form-group">
+          <label>Log Level</label>
+          <select id="logLevel">
+            <option value="error">Error Only</option>
+            <option value="warn">Warning</option>
+            <option value="info" selected>Information</option>
+            <option value="debug">Debug</option>
+          </select>
+        </div>
+        
+        <div style="margin-top: 16px;">
+          <button class="btn" onclick="saveAdvancedSettings()">Save Advanced Settings</button>
+          <button class="btn btn-secondary" onclick="resetToDefaults()">Reset to Defaults</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // ===== AUTHENTICATION & SECURITY =====
+    
+    // Check if user is logged in and has HR role
+    function checkAuth() {
+      const isLoggedIn = localStorage.getItem('isLoggedIn');
+      const userRole = localStorage.getItem('userRole');
+      const userEmail = localStorage.getItem('userEmail');
+      
+      if (!isLoggedIn || userRole !== 'hr') {
+        // Redirect to login if not authenticated or not HR
+        window.location.href = '/login';
+        return false;
+      }
+      
+      // Update user info in the UI
+      if (userEmail) {
+        document.getElementById('userEmail').textContent = userEmail;
+        // Extract name from email
+        const name = userEmail.split('@')[0];
+        document.getElementById('userName').textContent = name.charAt(0).toUpperCase() + name.slice(1);
+      }
+      
+      return true;
+    }
+    
+    // Logout functionality
+    document.getElementById('logoutBtn').addEventListener('click', function() {
+      localStorage.removeItem('isLoggedIn');
+      localStorage.removeItem('userRole');
+      localStorage.removeItem('userEmail');
+      window.location.href = '/redirect';
+    });
+    
+    // Settings Functions
+    function saveUserSettings() {
+      const defaultRole = document.getElementById('defaultUserRole').value;
+      const passwordPolicy = document.getElementById('passwordPolicy').value;
+      const sessionTimeout = document.getElementById('sessionTimeout').value;
+      
+      console.log('Saving user settings:', { defaultRole, passwordPolicy, sessionTimeout });
+      alert('User settings saved successfully!');
+    }
+    
+    function saveSystemSettings() {
+      const companyName = document.getElementById('companyName').value;
+      const systemLanguage = document.getElementById('systemLanguage').value;
+      const timeZone = document.getElementById('timeZone').value;
+      const dateFormat = document.getElementById('dateFormat').value;
+      
+      console.log('Saving system settings:', { companyName, systemLanguage, timeZone, dateFormat });
+      alert('System settings saved successfully!');
+    }
+    
+    function saveAdvancedSettings() {
+      const apiRateLimit = document.getElementById('apiRateLimit').value;
+      const cacheDuration = document.getElementById('cacheDuration').value;
+      const logLevel = document.getElementById('logLevel').value;
+      
+      console.log('Saving advanced settings:', { apiRateLimit, cacheDuration, logLevel });
+      alert('Advanced settings saved successfully!');
+    }
+    
+    function exportData() {
+      console.log('Exporting system data...');
+      alert('Data export started! You will receive a download link shortly.');
+    }
+    
+    function importData() {
+      console.log('Importing system data...');
+      alert('Please select a data file to import.');
+    }
+    
+    function resetToDefaults() {
+      if (confirm('Are you sure you want to reset all settings to default values? This action cannot be undone.')) {
+        console.log('Resetting settings to defaults...');
+        alert('Settings have been reset to default values.');
+        
+        // Reset form values
+        document.getElementById('defaultUserRole').value = 'hr';
+        document.getElementById('passwordPolicy').value = 'standard';
+        document.getElementById('sessionTimeout').value = '30';
+        document.getElementById('companyName').value = 'ThriveTrack Inc.';
+        document.getElementById('systemLanguage').value = 'en';
+        document.getElementById('timeZone').value = 'EST';
+        document.getElementById('dateFormat').value = 'MM/DD/YYYY';
+        document.getElementById('apiRateLimit').value = '100';
+        document.getElementById('cacheDuration').value = '300';
+        document.getElementById('logLevel').value = 'info';
+      }
+    }
+    
+    // Handle toggle switches
+    document.querySelectorAll('.toggle-switch input').forEach(toggle => {
+      toggle.addEventListener('change', function() {
+        console.log('Setting changed:', this.id, this.checked);
+        // In a real app, this would save the setting to the server
+      });
+    });
+    
+    // Check authentication on page load
+    if (!checkAuth()) {
+      // Stop execution if not authenticated
+      throw new Error('Authentication failed');
+    }
+  </script>
+</body>
+</html>
