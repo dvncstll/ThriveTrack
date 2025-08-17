@@ -66,6 +66,91 @@
     }
     .nav .nav-link:hover { background: #f8fafc; }
     .nav .nav-link.active { background: #eef2f7; font-weight: 600; }
+    
+    /* Dropdown Navigation Styles */
+    .dropdown {
+      position: relative;
+      width: 100%;
+    }
+    
+    .dropdown-toggle {
+      width: 100%; 
+      text-align: left;
+      padding: 10px 12px; 
+      border: 0; 
+      background: transparent; 
+      cursor: pointer;
+      border-radius: 12px; 
+      color: #0f172a; 
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.2s;
+    }
+    
+    .dropdown-toggle:hover { 
+      background: #f8fafc; 
+    }
+    
+    .dropdown-toggle.active { 
+      background: #eef2f7; 
+      font-weight: 600; 
+    }
+    
+    .dropdown-icon {
+      transition: transform 0.2s ease;
+      font-size: 12px;
+      color: var(--muted);
+      min-width: 16px;
+      text-align: center;
+    }
+    
+    .dropdown.open .dropdown-icon {
+      transform: rotate(180deg);
+    }
+    
+    .dropdown-menu {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease, padding 0.3s ease;
+      background: #f8fafc;
+      border-radius: 0 0 12px 12px;
+      margin-top: 2px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .dropdown.open .dropdown-menu {
+      max-height: 300px;
+      padding: 8px 0;
+    }
+    
+    .dropdown-item {
+      width: 100%; 
+      text-align: left;
+      padding: 8px 20px; 
+      border: 0; 
+      background: transparent; 
+      cursor: pointer;
+      color: #0f172a; 
+      font-size: 13px;
+      text-decoration: none; 
+      display: block; 
+      transition: all 0.2s;
+      border-left: 2px solid transparent;
+    }
+    
+    .dropdown-item:hover { 
+      background: rgba(20, 184, 166, 0.1);
+      border-left-color: var(--teal-600);
+    }
+    
+    .dropdown-item.active { 
+      background: rgba(20, 184, 166, 0.15);
+      font-weight: 500;
+      border-left-color: var(--teal-600);
+      color: var(--teal-600);
+    }
     .logout {
       margin-top: auto; width: 100%; border: 1px solid var(--line); background: #fff;
       padding: 10px 12px; border-radius: 12px; cursor: pointer;
@@ -136,13 +221,21 @@
       </div>
 
       <nav class="nav">
-        <a href="/employee-dashboard" class="nav-link">📊 Dashboard</a>
-        <a href="/employee-profile" class="nav-link">👤 Profile</a>
-        <a href="/employee-leave" class="nav-link">📋 Leave & Attendance</a>
-        <a href="/employee-workload" class="nav-link">⚖️ Workload Assessment</a>
-        <a href="/employee-feedback" class="nav-link">💬 Anonymous Feedback</a>
-        <a href="/employee-actions" class="nav-link">⚡ Quick Actions</a>
-        <a href="/employee-announcements" class="nav-link active">📢 Announcements</a>
+        <div class="dropdown open" id="dashboardDropdown">
+          <button class="dropdown-toggle active" id="dropdownToggle">
+            <span>📢 Announcements</span>
+            <span class="dropdown-icon">▼</span>
+          </button>
+          <div class="dropdown-menu">
+            <a href="/employee-dashboard" class="dropdown-item">📊 Dashboard</a>
+            <a href="/employee-profile" class="dropdown-item">👤 Profile</a>
+            <a href="/employee-leave" class="dropdown-item">📋 Leave & Attendance</a>
+            <a href="/employee-workload" class="dropdown-item">⚖️ Workload Assessment</a>
+            <a href="/employee-feedback" class="dropdown-item">💬 Anonymous Feedback</a>
+            <a href="/employee-actions" class="dropdown-item">⚡ Quick Actions</a>
+            <a href="/employee-announcements" class="dropdown-item active">📢 Announcements</a>
+          </div>
+        </div>
       </nav>
 
       <button class="logout" id="sidebarLogoutBtn">Logout</button>
@@ -248,6 +341,25 @@
     if (!checkAuth()) {
       // Stop execution if not authenticated
       throw new Error('Authentication failed');
+    }
+
+    // Initialize dropdown navigation
+    function initializeNavigation() {
+      const dropdownToggle = document.getElementById('dropdownToggle');
+      const dropdown = document.getElementById('dashboardDropdown');
+      
+      if (dropdownToggle && dropdown) {
+        dropdownToggle.addEventListener('click', function() {
+          dropdown.classList.toggle('open');
+        });
+      }
+    }
+
+    // Initialize navigation after DOM is loaded
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initializeNavigation);
+    } else {
+      initializeNavigation();
     }
   </script>
 </body>
