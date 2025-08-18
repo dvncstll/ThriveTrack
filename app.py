@@ -64,6 +64,30 @@ def employee_actions():
 def employee_announcements():
     return render_template('employee-announcements.html')
 
+@app.route('/employee-inventory')
+def employee_inventory():
+    return render_template('employee-inventory.html')
+
+@app.route('/employee-orders')
+def employee_orders():
+    return render_template('employee-orders.html')
+
+@app.route('/employee-purchase')
+def employee_purchase():
+    return render_template('employee-purchase.html')
+
+@app.route('/employee-reporting')
+def employee_reporting():
+    return render_template('employee-reporting.html')
+
+@app.route('/employee-support')
+def employee_support():
+    return render_template('employee-support.html')
+
+@app.route('/employee-settings')
+def employee_settings():
+    return render_template('employee-settings.html')
+
 @app.route('/login')
 def login():
     return render_template('login.html')
