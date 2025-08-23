@@ -427,17 +427,7 @@
 
     <!-- Main Content -->
     <main>
-           <!-- Header with User Info -->
-     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding: 16px; background: var(--card); border-radius: 12px; border: 1px solid var(--line);">
-       <div>
-         <div style="font-size: 14px; color: var(--muted); margin-bottom: 4px;">Welcome back</div>
-         <div style="font-size: 18px; font-weight: 600; color: var(--teal-600);" id="userName">Sarah</div>
-       </div>
-       <div style="display: flex; align-items: center; gap: 12px;">
-         <div style="font-size: 14px; color: var(--muted);" id="userEmail">sarah@company.com</div>
-         <button class="btn btn-secondary" id="logoutBtn" style="padding: 8px 16px; font-size: 12px;">Logout</button>
-       </div>
-     </div>
+           
 
 
 
@@ -545,18 +535,18 @@
 
       <!-- Recent Announcements -->
       <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
         <h3>Recent Announcements</h3>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <div id="announcementCount" style="font-size: 12px; color: var(--muted);">Loading...</div>
+            <button id="refreshDashboardAnnouncements" class="btn" style="padding: 6px 12px; font-size: 11px;">🔄</button>
+          </div>
+        </div>
         <div id="announcementsList">
-          <div class="announcement-item">
-            <div class="announcement-title">Team Meeting Tomorrow</div>
-            <div style="font-size: 13px; margin-bottom: 8px;">Weekly sync at 10 AM. Please prepare your updates.</div>
-            <div class="announcement-meta">1 hour ago • All Employees</div>
+          <div style="text-align: center; color: var(--muted); padding: 20px;">Loading announcements...</div>
           </div>
-          <div class="announcement-item urgent">
-            <div class="announcement-title">System Maintenance</div>
-            <div style="font-size: 13px; margin-bottom: 8px;">Platform will be down for 2 hours tonight for updates.</div>
-            <div class="announcement-meta">3 hours ago • All Employees • Urgent</div>
-          </div>
+        <div style="margin-top: 12px; text-align: center;">
+          <a href="/employee-announcements" class="btn btn-secondary" style="padding: 8px 16px; font-size: 12px;">View All Announcements</a>
         </div>
       </div>
 
@@ -602,13 +592,7 @@
       return true;
     }
     
-    // Logout functionality
-    document.getElementById('logoutBtn').addEventListener('click', function() {
-      localStorage.removeItem('isLoggedIn');
-      localStorage.removeItem('userRole');
-      localStorage.removeItem('userEmail');
-      window.location.href = '/redirect';
-    });
+
     
     // Sidebar logout functionality
     document.getElementById('sidebarLogoutBtn').addEventListener('click', function() {
@@ -623,6 +607,81 @@
       // Stop execution if not authenticated
       throw new Error('Authentication failed');
     }
+
+    // Enhanced announcements system for dashboard
+    let dashboardAnnouncements = [];
+
+    // Load announcements from database
+    function loadAnnouncements() {
+      fetch('/api/announcements')
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            dashboardAnnouncements = data.announcements;
+            updateAnnouncementsList();
+          } else {
+            console.error('Error loading announcements:', data.message);
+            showAnnouncementError('Error loading announcements: ' + data.message);
+          }
+        })
+        .catch(error => {
+          console.error('Error loading announcements:', error);
+          showAnnouncementError('Error loading announcements. Please try again.');
+        });
+    }
+
+    function updateAnnouncementsList() {
+      const container = document.getElementById('announcementsList');
+      const countElement = document.getElementById('announcementCount');
+      
+      if (container) {
+        container.innerHTML = '';
+        
+        if (dashboardAnnouncements.length === 0) {
+          container.innerHTML = '<div style="text-align: center; color: var(--muted); padding: 20px;">No announcements yet</div>';
+        } else {
+          // Show only the 2 most recent announcements on dashboard
+          dashboardAnnouncements.slice(0, 2).forEach(item => {
+            const div = document.createElement('div');
+            div.className = `announcement-item ${item.urgent ? 'urgent' : ''}`;
+            div.innerHTML = `
+              <div class="announcement-title">${item.title}</div>
+              <div style="font-size: 13px; margin-bottom: 8px;">${item.content}</div>
+              <div class="announcement-meta">${item.time_ago} • ${item.audience}${item.urgent ? ' • Urgent' : ''}</div>
+            `;
+            container.appendChild(div);
+          });
+        }
+      }
+      
+      if (countElement) {
+        countElement.textContent = `${dashboardAnnouncements.length} total`;
+      }
+    }
+
+    function showAnnouncementError(message) {
+      const container = document.getElementById('announcementsList');
+      if (container) {
+        container.innerHTML = `<div style="text-align: center; color: var(--rose-600); padding: 20px; background: var(--rose-50); border-radius: 8px;">${message}</div>`;
+      }
+    }
+
+    // Load announcements when page loads
+    loadAnnouncements();
+
+    // Refresh announcements button
+    document.getElementById('refreshDashboardAnnouncements').addEventListener('click', function() {
+      this.textContent = '⏳';
+      this.disabled = true;
+      loadAnnouncements();
+      setTimeout(() => {
+        this.textContent = '🔄';
+        this.disabled = false;
+      }, 1000);
+    });
+
+    // Auto-refresh announcements every 5 minutes
+    setInterval(loadAnnouncements, 5 * 60 * 1000);
 
     // Initialize sidebar navigation
     function initializeNavigation() {
@@ -685,13 +744,37 @@
         return;
       }
       
+      const userEmail = localStorage.getItem('userEmail');
+      
+      // Submit wellness data to the server
+      fetch('/submit_wellness', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          moodRating: parseInt(selectedMood),
+          sleepQuality: 7, // Default value
+          energyLevel: parseInt(selectedMood) + 2, // Correlate with mood
+          stressFactors: selectedMood <= 2 ? ['workload', 'deadlines'] : [],
+          userEmail: userEmail
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
       document.getElementById('moodSubmitted').style.display = 'block';
       this.textContent = 'Mood Submitted';
       this.disabled = true;
       this.style.background = 'var(--green-600)';
-      
-      // In a real app, this would send data to the server
-      console.log('Mood submitted:', { mood: selectedMood, emoji: selectedEmoji });
+        } else {
+          alert('Error submitting mood: ' + data.message);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Error submitting mood. Please try again.');
+      });
     });
 
     // Weekly Progress Chart

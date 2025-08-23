@@ -482,6 +482,107 @@
       // Stop execution if not authenticated
       throw new Error('Authentication failed');
     }
+
+    // Load real employee data for HR reporting
+    function loadReportingData() {
+      // Load employee feedback for reports
+      fetch('/api/hr/feedback')
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            updateFeedbackReports(data.feedback);
+          }
+        })
+        .catch(error => console.error('Error loading feedback for reports:', error));
+
+      // Load wellness trends for reports
+      fetch('/api/hr/wellness')
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            updateWellnessReports(data.wellness_summary);
+          }
+        })
+        .catch(error => console.error('Error loading wellness data for reports:', error));
+
+      // Load workload analysis for reports
+      fetch('/api/hr/workload')
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            updateWorkloadReports(data.workload_summary);
+          }
+        })
+        .catch(error => console.error('Error loading workload data for reports:', error));
+    }
+
+    function updateFeedbackReports(feedback) {
+      // Add feedback summary to reports
+      const reportsList = document.getElementById('reportsList');
+      if (reportsList && feedback.length > 0) {
+        const feedbackReport = document.createElement('div');
+        feedbackReport.className = 'report-item';
+        feedbackReport.innerHTML = `
+          <div class="report-info">
+            <h4>Employee Feedback Report - ${new Date().toLocaleDateString()}</h4>
+            <div class="report-meta">Generated: ${new Date().toLocaleDateString()} • Type: Feedback Analysis • Responses: ${feedback.length}</div>
+          </div>
+          <div class="report-actions">
+            <button class="btn btn-secondary" onclick="downloadFeedbackReport()">Download PDF</button>
+            <button class="btn btn-secondary" onclick="viewFeedbackReport()">View</button>
+          </div>
+        `;
+        // Insert at the beginning
+        reportsList.insertBefore(feedbackReport, reportsList.firstChild);
+      }
+    }
+
+    function updateWellnessReports(wellness) {
+      if (wellness.total_responses > 0) {
+        const reportsList = document.getElementById('reportsList');
+        const wellnessReport = document.createElement('div');
+        wellnessReport.className = 'report-item';
+        wellnessReport.innerHTML = `
+          <div class="report-info">
+            <h4>Employee Wellness Report - ${new Date().toLocaleDateString()}</h4>
+            <div class="report-meta">Generated: ${new Date().toLocaleDateString()} • Type: Wellness Analysis • Responses: ${wellness.total_responses}</div>
+            <div style="font-size: 12px; color: var(--muted); margin-top: 4px;">
+              Avg Mood: ${wellness.average_mood}/5 | Avg Energy: ${wellness.average_energy}/10 | Avg Sleep: ${wellness.average_sleep}/10
+            </div>
+          </div>
+          <div class="report-actions">
+            <button class="btn btn-secondary" onclick="downloadWellnessReport()">Download PDF</button>
+            <button class="btn btn-secondary" onclick="viewWellnessReport()">View</button>
+          </div>
+        `;
+        reportsList.insertBefore(wellnessReport, reportsList.firstChild);
+      }
+    }
+
+    function updateWorkloadReports(workload) {
+      if (workload.total_responses > 0) {
+        const reportsList = document.getElementById('reportsList');
+        const workloadReport = document.createElement('div');
+        workloadReport.className = 'report-item';
+        workloadReport.innerHTML = `
+          <div class="report-info">
+            <h4>Employee Workload Analysis - ${new Date().toLocaleDateString()}</h4>
+            <div class="report-meta">Generated: ${new Date().toLocaleDateString()} • Type: Workload Analysis • Responses: ${workload.total_responses}</div>
+            <div style="font-size: 12px; color: var(--muted); margin-top: 4px;">
+              High Stress: ${workload.high_stress_employees} | Medium: ${workload.medium_stress_employees} | Low: ${workload.low_stress_employees}
+            </div>
+          </div>
+          <div class="report-actions">
+            <button class="btn btn-secondary" onclick="downloadWorkloadReport()">Download PDF</button>
+            <button class="btn btn-secondary" onclick="viewWorkloadReport()">View</button>
+          </div>
+        `;
+        reportsList.insertBefore(workloadReport, reportsList.firstChild);
+      }
+    }
+
+    // Load reporting data when page loads
+    loadReportingData();
   </script>
 </body>
 </html>

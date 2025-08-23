@@ -187,24 +187,142 @@
     .card h3 { margin: 0 0 16px; font-size: 18px; font-weight: 600; }
     
     .announcement-item {
-      padding: 16px;
-      background: #f8fafc;
-      border-radius: 8px;
-      border-left: 3px solid var(--teal-600);
-      margin-bottom: 12px;
-    }
+       padding: 20px;
+       background: white;
+       border-radius: 12px;
+       border: 2px solid var(--teal-100);
+       margin-bottom: 16px;
+       box-shadow: 0 2px 8px rgba(44, 109, 98, 0.08);
+       transition: all 0.3s ease;
+       position: relative;
+       overflow: hidden;
+     }
+     
+     .announcement-item::before {
+       content: '';
+       position: absolute;
+       left: 0;
+       top: 0;
+       bottom: 0;
+       width: 4px;
+       background: var(--teal-600);
+       border-radius: 0 2px 2px 0;
+     }
+     
+     .announcement-item:hover {
+       transform: translateY(-2px);
+       box-shadow: 0 4px 16px rgba(44, 109, 98, 0.15);
+       border-color: var(--teal-200);
+     }
+     
     .announcement-item.urgent {
-      border-left-color: var(--rose-600);
-      background: var(--rose-50);
+       border-color: var(--rose-200);
+       background: linear-gradient(135deg, var(--rose-50), white);
+     }
+     
+     .announcement-item.urgent::before {
+       background: var(--rose-600);
+     }
+     
+     .announcement-item.urgent:hover {
+       border-color: var(--rose-300);
+       box-shadow: 0 4px 16px rgba(220, 38, 38, 0.15);
     }
     .announcement-title {
-      font-weight: 600;
-      margin-bottom: 8px;
-      font-size: 14px;
-    }
+       font-weight: 700;
+       margin-bottom: 12px;
+       font-size: 16px;
+       color: var(--teal-700);
+       line-height: 1.3;
+     }
+     
     .announcement-meta {
-      font-size: 12px;
-      color: var(--muted);
+       font-size: 13px;
+       color: var(--teal-600);
+       font-weight: 500;
+       padding: 8px 12px;
+       background: var(--teal-50);
+       border-radius: 8px;
+       display: inline-block;
+       border: 1px solid var(--teal-200);
+     }
+     
+     /* Enhanced Controls Styling */
+     .filter-btn {
+       transition: all 0.3s ease;
+     }
+     
+     .filter-btn:hover {
+       transform: translateY(-2px);
+       box-shadow: 0 4px 12px rgba(44, 109, 98, 0.3) !important;
+     }
+     
+     .filter-btn.active {
+       background: var(--teal-600) !important;
+       color: white !important;
+       border-color: var(--teal-600) !important;
+     }
+     
+     .filter-btn:not(.active):hover {
+       background: var(--teal-100) !important;
+       border-color: var(--teal-400) !important;
+     }
+     
+     .refresh-btn:hover {
+       transform: translateY(-2px);
+       box-shadow: 0 4px 12px rgba(8, 145, 178, 0.3) !important;
+       background: var(--cyan-700) !important;
+       border-color: var(--cyan-700) !important;
+     }
+     
+     #searchAnnouncements:focus {
+       outline: none;
+       border-color: var(--teal-600) !important;
+       box-shadow: 0 0 0 3px rgba(44, 109, 98, 0.1), 0 2px 8px rgba(44, 109, 98, 0.1) !important;
+     }
+     
+     #searchAnnouncements:hover {
+       border-color: var(--teal-400) !important;
+       box-shadow: 0 2px 12px rgba(44, 109, 98, 0.15) !important;
+     }
+     
+     /* Enhanced button animations */
+     .filter-btn, .refresh-btn {
+       position: relative;
+       overflow: hidden;
+     }
+     
+     .filter-btn::before, .refresh-btn::before {
+       content: '';
+       position: absolute;
+       top: 50%;
+       left: 50%;
+       width: 0;
+       height: 0;
+       background: rgba(255, 255, 255, 0.2);
+       border-radius: 50%;
+       transform: translate(-50%, -50%);
+       transition: width 0.6s, height 0.6s;
+     }
+     
+     .filter-btn:active::before, .refresh-btn:active::before {
+       width: 300px;
+       height: 300px;
+     }
+     
+     /* Loading animation for refresh button */
+     .refresh-btn.loading {
+       pointer-events: none;
+       opacity: 0.7;
+     }
+     
+     .refresh-btn.loading span:first-child {
+       animation: spin 1s linear infinite;
+     }
+     
+     @keyframes spin {
+       from { transform: rotate(0deg); }
+       to { transform: rotate(360deg); }
     }
   </style>
 </head>
@@ -243,17 +361,7 @@
 
     <!-- Main Content -->
     <main>
-      <!-- Header with User Info -->
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding: 16px; background: var(--card); border-radius: 12px; border: 1px solid var(--line);">
-        <div>
-          <div style="font-size: 14px; color: var(--muted); margin-bottom: 4px;">Welcome back</div>
-          <div style="font-size: 18px; font-weight: 600; color: var(--teal-600);" id="userName">Sarah</div>
-        </div>
-        <div style="display: flex; align-items: center; gap: 12px;">
-          <div style="font-size: 14px; color: var(--muted);" id="userEmail">sarah@company.com</div>
-          <button class="btn btn-secondary" id="logoutBtn" style="padding: 8px 16px; font-size: 12px;">Logout</button>
-        </div>
-      </div>
+
 
       <!-- Header -->
       <div class="header">
@@ -261,30 +369,37 @@
         <div class="subtitle">Stay updated with the latest company news and updates</div>
       </div>
 
-      <!-- Announcements Section -->
-      <div class="card">
-        <h3>Recent Announcements</h3>
+      <!-- Enhanced Announcements Controls -->
+      <div class="card" style="margin-bottom: 24px; background: linear-gradient(135deg, var(--teal-50), var(--cyan-50)); border: 2px solid var(--teal-200);">
+        <div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
+          <div style="flex: 1; min-width: 250px;">
+            <input type="text" id="searchAnnouncements" placeholder="🔍 Search announcements..." 
+                   style="width: 100%; padding: 14px 16px; border: 2px solid var(--teal-200); border-radius: 12px; font-size: 14px; background: white; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(44, 109, 98, 0.1);">
+          </div>
+          <div style="display: flex; gap: 12px; align-items: flex-end;">
+            <div style="display: flex; gap: 8px;">
+              <button id="filterAll" class="filter-btn active" style="padding: 10px 20px; font-size: 13px; font-weight: 500; border: 2px solid var(--teal-600); background: var(--teal-600); color: white; border-radius: 10px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(44, 109, 98, 0.2);">All</button>
+              <button id="filterUrgent" class="filter-btn" style="padding: 10px 20px; font-size: 13px; font-weight: 500; border: 2px solid var(--teal-200); background: white; color: var(--teal-700); border-radius: 10px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(44, 109, 98, 0.1);">Urgent Only</button>
+            </div>
+            <button id="refreshAnnouncements" class="refresh-btn" style="padding: 12px 20px; font-size: 13px; font-weight: 500; border: 2px solid var(--cyan-600); background: var(--cyan-600); color: white; border-radius: 10px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(8, 145, 178, 0.2); display: flex; align-items: center; gap: 8px;">
+              <span>🔄</span>
+              <span>Refresh</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Enhanced Announcements Section -->
+      <div class="card" style="border: 2px solid var(--teal-100); background: linear-gradient(135deg, white, var(--teal-50));">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 2px solid var(--teal-100);">
+          <div>
+            <h3 style="margin: 0; color: var(--teal-700); font-size: 20px;">📢 Recent Announcements</h3>
+            <div style="font-size: 13px; color: var(--teal-600); margin-top: 4px;">Stay updated with company news and updates</div>
+          </div>
+          <div id="announcementCount" style="font-size: 13px; color: var(--teal-700); font-weight: 600; padding: 8px 16px; background: var(--teal-100); border-radius: 20px; border: 1px solid var(--teal-200);">Loading...</div>
+          </div>
         <div id="announcementsList">
-          <div class="announcement-item">
-            <div class="announcement-title">Team Meeting Tomorrow</div>
-            <div style="font-size: 13px; margin-bottom: 8px;">Weekly sync at 10 AM. Please prepare your updates.</div>
-            <div class="announcement-meta">1 hour ago • All Employees</div>
-          </div>
-          <div class="announcement-item urgent">
-            <div class="announcement-title">System Maintenance</div>
-            <div style="font-size: 13px; margin-bottom: 8px;">Platform will be down for 2 hours tonight for updates.</div>
-            <div class="announcement-meta">3 hours ago • All Employees • Urgent</div>
-          </div>
-          <div class="announcement-item">
-            <div class="announcement-title">New Project Launch</div>
-            <div style="font-size: 13px; margin-bottom: 8px;">Exciting new initiative starting next week. Details to follow.</div>
-            <div class="announcement-meta">1 day ago • All Employees</div>
-          </div>
-          <div class="announcement-item">
-            <div class="announcement-title">Wellness Program Update</div>
-            <div style="font-size: 13px; margin-bottom: 8px;">New mental health resources available. Check the employee portal for details.</div>
-            <div class="announcement-meta">2 days ago • All Employees</div>
-          </div>
+          <div style="text-align: center; color: var(--muted); padding: 20px;">Loading announcements...</div>
         </div>
       </div>
     </main>
@@ -321,13 +436,7 @@
       return true;
     }
     
-    // Logout functionality
-    document.getElementById('logoutBtn').addEventListener('click', function() {
-      localStorage.removeItem('isLoggedIn');
-      localStorage.removeItem('userRole');
-      localStorage.removeItem('userEmail');
-      window.location.href = '/redirect';
-    });
+
     
     // Sidebar logout functionality
     document.getElementById('sidebarLogoutBtn').addEventListener('click', function() {
@@ -342,6 +451,156 @@
       // Stop execution if not authenticated
       throw new Error('Authentication failed');
     }
+
+    // Enhanced announcements system
+    let allAnnouncements = [];
+    let filteredAnnouncements = [];
+    let currentFilter = 'all';
+    let searchTerm = '';
+
+    // Load announcements from database
+    function loadAnnouncements() {
+      fetch('/api/announcements')
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            allAnnouncements = data.announcements;
+            applyFilters();
+            updateAnnouncementsList();
+          } else {
+            console.error('Error loading announcements:', data.message);
+            showError('Error loading announcements: ' + data.message);
+          }
+        })
+        .catch(error => {
+          console.error('Error loading announcements:', error);
+          showError('Error loading announcements. Please try again.');
+        });
+    }
+
+    function applyFilters() {
+      filteredAnnouncements = allAnnouncements.filter(item => {
+        // Apply search filter
+        const matchesSearch = searchTerm === '' || 
+          item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          item.content.toLowerCase().includes(searchTerm.toLowerCase());
+        
+        // Apply urgency filter
+        const matchesUrgency = currentFilter === 'all' || 
+          (currentFilter === 'urgent' && item.urgent);
+        
+        return matchesSearch && matchesUrgency;
+      });
+    }
+
+    function updateAnnouncementsList() {
+      const container = document.getElementById('announcementsList');
+      const countElement = document.getElementById('announcementCount');
+      
+      if (container) {
+        container.innerHTML = '';
+        
+        if (filteredAnnouncements.length === 0) {
+          if (allAnnouncements.length === 0) {
+            container.innerHTML = '<div style="text-align: center; color: var(--muted); padding: 20px;">No announcements yet</div>';
+          } else {
+            container.innerHTML = '<div style="text-align: center; color: var(--muted); padding: 20px;">No announcements match your search criteria</div>';
+          }
+        } else {
+          filteredAnnouncements.forEach(item => {
+            const div = document.createElement('div');
+            div.className = `announcement-item ${item.urgent ? 'urgent' : ''}`;
+            div.innerHTML = `
+              <div class="announcement-title">${item.title}</div>
+              <div style="font-size: 13px; margin-bottom: 8px;">${item.content}</div>
+              <div class="announcement-meta">${item.time_ago} • ${item.audience}${item.urgent ? ' • Urgent' : ''}</div>
+            `;
+            container.appendChild(div);
+          });
+        }
+      }
+      
+      if (countElement) {
+        countElement.textContent = `${filteredAnnouncements.length} of ${allAnnouncements.length} announcements`;
+      }
+    }
+
+    function showError(message) {
+      const container = document.getElementById('announcementsList');
+      if (container) {
+        container.innerHTML = `<div style="text-align: center; color: var(--rose-600); padding: 20px; background: var(--rose-50); border-radius: 8px;">${message}</div>`;
+      }
+    }
+
+    // Load announcements when page loads
+    loadAnnouncements();
+
+    // Event listeners for enhanced functionality
+    document.getElementById('searchAnnouncements').addEventListener('input', function() {
+      searchTerm = this.value;
+      applyFilters();
+      updateAnnouncementsList();
+    });
+
+    document.getElementById('filterAll').addEventListener('click', function() {
+      currentFilter = 'all';
+      updateFilterButtons();
+      applyFilters();
+      updateAnnouncementsList();
+    });
+
+    document.getElementById('filterUrgent').addEventListener('click', function() {
+      currentFilter = 'urgent';
+      updateFilterButtons();
+      applyFilters();
+      updateAnnouncementsList();
+    });
+
+    document.getElementById('refreshAnnouncements').addEventListener('click', function() {
+      this.classList.add('loading');
+      this.innerHTML = '<span>🔄</span><span>Loading...</span>';
+      this.disabled = true;
+      loadAnnouncements();
+      setTimeout(() => {
+        this.classList.remove('loading');
+        this.innerHTML = '<span>🔄</span><span>Refresh</span>';
+        this.disabled = false;
+      }, 1000);
+    });
+
+    function updateFilterButtons() {
+      const filterAll = document.getElementById('filterAll');
+      const filterUrgent = document.getElementById('filterUrgent');
+      
+      if (currentFilter === 'all') {
+        // Update All button to active state
+        filterAll.style.background = 'var(--teal-600)';
+        filterAll.style.color = 'white';
+        filterAll.style.borderColor = 'var(--teal-600)';
+        filterAll.style.boxShadow = '0 2px 8px rgba(44, 109, 98, 0.2)';
+        
+        // Update Urgent button to inactive state
+        filterUrgent.style.background = 'white';
+        filterUrgent.style.color = 'var(--teal-700)';
+        filterUrgent.style.borderColor = 'var(--teal-200)';
+        filterUrgent.style.boxShadow = '0 2px 8px rgba(44, 109, 98, 0.1)';
+      } else {
+        // Update Urgent button to active state
+        filterUrgent.style.background = 'var(--teal-600)';
+        filterUrgent.style.color = 'white';
+        filterUrgent.style.borderColor = 'var(--teal-600)';
+        filterUrgent.style.boxShadow = '0 2px 8px rgba(44, 109, 98, 0.2)';
+        
+        // Update All button to inactive state
+        filterAll.style.background = 'white';
+        filterAll.style.color = 'var(--teal-700)';
+        filterAll.style.borderColor = 'var(--teal-200)';
+        filterAll.style.boxShadow = '0 2px 8px rgba(44, 109, 98, 0.1)';
+      }
+    }
+
+    // Auto-refresh announcements every 5 minutes
+    setInterval(loadAnnouncements, 5 * 60 * 1000);
 
     // Initialize dropdown navigation
     function initializeNavigation() {

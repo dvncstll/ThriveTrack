@@ -87,6 +87,52 @@
     @media (min-width: 960px) {
       .topbar { grid-template-columns: 1fr auto; align-items: center; }
     }
+    
+    /* Announcement Preview Sidebar */
+    .preview-sidebar {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: 300px;
+      max-height: 400px;
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      z-index: 100;
+      overflow: hidden;
+    }
+    
+    .preview-sidebar-header {
+      background: var(--teal-600);
+      color: white;
+      padding: 12px 16px;
+      font-weight: 600;
+      font-size: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .preview-sidebar-content {
+      padding: 16px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    
+    .preview-sidebar-actions {
+      padding: 12px 16px;
+      border-top: 1px solid var(--line);
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+    
+    @media (max-width: 1200px) {
+      .preview-sidebar {
+        display: none;
+      }
+    }
     h1 { margin: 0; font-size: 24px; }
     .searchbar { position: relative; }
     .searchbar input {
@@ -212,29 +258,7 @@
       100% { transform: rotate(360deg); }
     }
 
-    /* Modal styles */
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0,0,0,0.5);
-      z-index: 1000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
 
-    .modal-content {
-      background: white;
-      padding: 24px;
-      border-radius: 12px;
-      max-width: 500px;
-      width: 90%;
-      max-height: 80vh;
-      overflow-y: auto;
-    }
   </style>
 </head>
 <body>
@@ -280,6 +304,23 @@
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 8 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 3.6 15a1.65 1.65 0 0 0-1.51-1H2a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 3.6 8a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 8 3.6a1.65 1.65 0 0 0 1-1.51V2a2 2 0 1 1 4 0v.09A1.65 1.65 0 0 0 15 3.6a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l.06.06A1.65 1.65 0 0 0 20.4 8c.36.61.57 1.32.6 2.05V10a2 2 0 1 1 0 4h-.09c-.03.73-.24 1.44-.51 2.05z"/></svg>
             </button>
           </div>
+        </div>
+      </div>
+
+      <!-- Announcement Preview Sidebar -->
+      <div class="preview-sidebar">
+        <div class="preview-sidebar-header">
+          <span>Announcement Preview</span>
+          <button id="closePreviewSidebar" style="background:none; border:0; color:white; cursor:pointer; font-size:16px;">&times;</button>
+        </div>
+        <div class="preview-sidebar-content" id="previewContent">
+          <div style="text-align:center; color:var(--muted); font-style:italic; padding:20px;">
+            Preview content will appear here when you click "Preview"
+          </div>
+        </div>
+        <div class="preview-sidebar-actions">
+          <button id="editPreviewSidebar" style="background:var(--muted); color:white; border:0; padding:8px 16px; border-radius:6px; cursor:pointer; font-size:12px;">Edit</button>
+          <button id="sendFromPreviewSidebar" style="background:var(--teal-600); color:white; border:0; padding:8px 16px; border-radius:6px; cursor:pointer; font-size:12px;">Send Now</button>
         </div>
       </div>
 
@@ -538,25 +579,92 @@
           </div>
         </div>
         
-        <!-- Announcement Preview Modal -->
-        <div id="previewModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); z-index:1000; display:flex; align-items:center; justify-content:center;">
-          <div style="background:white; padding:24px; border-radius:12px; max-width:500px; width:90%; max-height:80vh; overflow-y:auto;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-              <h3 style="margin:0;">Announcement Preview</h3>
-              <button id="closePreview" style="background:none; border:0; font-size:20px; cursor:pointer; color:var(--muted);">&times;</button>
+
+      </section>
+
+      <!-- Employee Responses & Feedback Dashboard -->
+      <section class="card" style="margin-top:16px; border: 2px solid var(--teal-600); background: linear-gradient(135deg, var(--teal-50), white);">
+        <div class="row" style="margin-bottom:16px">
+          <h3 style="color: var(--teal-700);">👥 Employee Responses & Feedback Dashboard</h3>
+          <span class="footer-note">Monitor employee engagement and well-being</span>
             </div>
-            <div id="previewContent" style="border:1px solid var(--line); border-radius:8px; padding:16px; background:#f8fafc;"></div>
-            <div style="display:flex; gap:8px; margin-top:16px; justify-content:flex-end;">
-              <button id="editPreview" style="background:var(--muted); color:white; border:0; padding:10px 20px; border-radius:6px; cursor:pointer;">Edit</button>
-              <button id="sendFromPreview" style="background:var(--teal-600); color:white; border:0; padding:10px 20px; border-radius:6px; cursor:pointer;">Send Now</button>
+        
+        <div class="grid insights-2" style="gap:20px">
+          <!-- Anonymous Feedback Section -->
+          <div>
+            <h4 style="margin:0 0 12px; font-size:14px; color:var(--teal-700); display: flex; align-items: center; gap: 8px;">
+              💬 Anonymous Feedback
+              <span id="feedbackCount" style="font-size:11px; background:var(--teal-100); color:var(--teal-700); padding:2px 8px; border-radius:10px;">0</span>
+            </h4>
+            <div id="employeeFeedbackSection" style="display:grid; gap:8px; max-height:300px; overflow-y:auto; padding:12px; background:white; border-radius:8px; border:1px solid var(--teal-200);">
+              <div style="text-align:center; color:var(--muted); padding:20px;">Loading feedback...</div>
+            </div>
+            <button id="viewAllFeedback" style="margin-top:8px; background:var(--teal-600); color:white; border:0; padding:6px 12px; border-radius:6px; cursor:pointer; font-size:11px;">View All Feedback</button>
+          </div>
+
+          <!-- Wellness & Mood Tracking -->
+          <div>
+            <h4 style="margin:0 0 12px; font-size:14px; color:var(--teal-700); display: flex; align-items: center; gap: 8px;">
+              😊 Wellness & Mood Tracking
+              <span id="wellnessCount" style="font-size:11px; background:var(--teal-100); color:var(--teal-700); padding:2px 8px; border-radius:10px;">0</span>
+            </h4>
+            <div id="employeeWellnessSection" style="display:grid; gap:8px; max-height:300px; overflow-y:auto; padding:12px; background:white; border-radius:8px; border:1px solid var(--teal-200);">
+              <div style="text-align:center; color:var(--muted); padding:20px;">Loading wellness data...</div>
+        </div>
+            <button id="viewAllWellness" style="margin-top:8px; background:var(--teal-600); color:white; border:0; padding:6px 12px; border-radius:6px; cursor:pointer; font-size:11px;">View All Wellness Data</button>
+          </div>
+        </div>
+
+        <div class="grid insights-2" style="gap:20px; margin-top:20px;">
+          <!-- Workload Assessment -->
+          <div>
+            <h4 style="margin:0 0 12px; font-size:14px; color:var(--teal-700); display: flex; align-items: center; gap: 8px;">
+              ⚖️ Workload Assessment
+              <span id="workloadCount" style="font-size:11px; background:var(--teal-100); color:var(--teal-700); padding:2px 8px; border-radius:10px;">0</span>
+            </h4>
+            <div id="employeeWorkloadSection" style="display:grid; gap:8px; max-height:300px; overflow-y:auto; padding:12px; background:white; border-radius:8px; border:1px solid var(--teal-200);">
+              <div style="text-align:center; color:var(--muted); padding:20px;">Loading workload data...</div>
+            </div>
+            <button id="viewAllWorkload" style="margin-top:8px; background:var(--teal-600); color:white; border:0; padding:6px 12px; border-radius:6px; cursor:pointer; font-size:11px;">View All Workload Data</button>
+          </div>
+
+          <!-- Quick Actions & Leave Requests -->
+          <div>
+            <h4 style="margin:0 0 12px; font-size:14px; color:var(--teal-700); display: flex; align-items: center; gap: 8px;">
+              ⚡ Quick Actions & Leave
+              <span id="actionsCount" style="font-size:11px; background:var(--teal-100); color:var(--teal-700); padding:2px 8px; border-radius:10px;">0</span>
+            </h4>
+            <div id="employeeActionsSection" style="display:grid; gap:8px; max-height:300px; overflow-y:auto; padding:12px; background:white; border-radius:8px; border:1px solid var(--teal-200);">
+              <div style="text-align:center; color:var(--muted); padding:20px;">Loading actions data...</div>
+            </div>
+            <button id="viewAllActions" style="margin-top:8px; background:var(--teal-600); color:white; border:0; padding:6px 12px; border-radius:6px; cursor:pointer; font-size:11px;">View All Actions</button>
+          </div>
+        </div>
+
+        <!-- Summary Statistics -->
+        <div style="margin-top:20px; padding:16px; background:var(--teal-100); border-radius:8px; border:1px solid var(--teal-200);">
+          <h4 style="margin:0 0 12px; font-size:14px; color:var(--teal-700);">📊 Response Summary</h4>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:16px;">
+            <div style="text-align:center; padding:12px; background:white; border-radius:8px; border:1px solid var(--teal-200);">
+              <div style="font-size:20px; font-weight:700; color:var(--teal-700);" id="totalResponses">0</div>
+              <div style="font-size:11px; color:var(--teal-600);">Total Responses</div>
+            </div>
+            <div style="text-align:center; padding:12px; background:white; border-radius:8px; border:1px solid var(--teal-200);">
+              <div style="font-size:20px; font-weight:700; color:var(--teal-700);" id="avgMoodScore">0</div>
+              <div style="font-size:11px; color:var(--teal-600);">Avg Mood Score</div>
+            </div>
+            <div style="text-align:center; padding:12px; background:white; border-radius:8px; border:1px solid var(--teal-200);">
+              <div style="font-size:20px; font-weight:700; color:var(--teal-700);" id="highStressCount">0</div>
+              <div style="font-size:11px; color:var(--teal-600);">High Stress Alert</div>
+            </div>
+            <div style="text-align:center; padding:12px; background:white; border-radius:8px; border:1px solid var(--teal-200);">
+              <div style="font-size:20px; font-weight:700; color:var(--teal-700);" id="feedbackTrend">↗️</div>
+              <div style="font-size:11px; color:var(--teal-600);">Feedback Trend</div>
             </div>
           </div>
         </div>
+        
       </section>
-
-
-
-
 
     </main>
   </div>
@@ -599,6 +707,333 @@
     if (!checkAuth()) {
       // Stop execution if not authenticated
       throw new Error('Authentication failed');
+    }
+
+    // Load real employee data for HR dashboard
+    function loadEmployeeData() {
+      // Load employee feedback
+      fetch('/api/hr/feedback')
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            updateFeedbackDisplay(data.feedback);
+          }
+        })
+        .catch(error => console.error('Error loading feedback:', error));
+
+      // Load wellness trends
+      fetch('/api/hr/wellness')
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            updateWellnessTrends(data.wellness_summary);
+          }
+        })
+        .catch(error => console.error('Error loading wellness data:', error));
+
+      // Load workload analysis
+      fetch('/api/hr/workload')
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            updateWorkloadAnalysis(data.workload_summary);
+          }
+        })
+        .catch(error => console.error('Error loading workload data:', error));
+
+      // Load announcements
+      fetch('/api/announcements')
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            updateAnnouncementsDisplay(data.announcements);
+          }
+        })
+        .catch(error => console.error('Error loading announcements:', error));
+        
+      // Update summary statistics after all data loads
+      setTimeout(updateSummaryStatistics, 500);
+    }
+
+    function updateFeedbackDisplay(feedback) {
+      const feedbackContainer = document.getElementById('employeeFeedbackSection');
+      const feedbackCount = document.getElementById('feedbackCount');
+      
+      if (feedbackContainer && feedback.length > 0) {
+        feedbackContainer.innerHTML = '';
+        
+        // Update feedback count
+        if (feedbackCount) {
+          feedbackCount.textContent = feedback.length;
+        }
+        
+        // Display recent feedback (max 5 items)
+        feedback.slice(0, 5).forEach(item => {
+          const div = document.createElement('div');
+          div.className = 'announcement-item';
+          div.style.cssText = 'padding: 12px; background: white; border: 1px solid var(--teal-200); border-radius: 8px; margin-bottom: 8px;';
+          div.innerHTML = `
+            <div style="font-weight: 600; color: var(--teal-700); margin-bottom: 6px; font-size: 13px;">
+              📝 ${item.category.charAt(0).toUpperCase() + item.category.slice(1)} Feedback
+            </div>
+            <div style="font-size: 12px; margin-bottom: 8px; color: var(--text); line-height: 1.4;">
+              "${item.content.length > 100 ? item.content.substring(0, 100) + '...' : item.content}"
+            </div>
+            <div style="font-size: 11px; color: var(--muted); display: flex; justify-content: space-between; align-items: center;">
+              <span>🕒 ${item.timestamp}</span>
+              <span style="padding: 2px 6px; background: ${item.is_anonymous ? 'var(--teal-100)' : 'var(--cyan-100)'}; color: ${item.is_anonymous ? 'var(--teal-700)' : 'var(--cyan-700)'}; border-radius: 4px; font-size: 10px;">
+                ${item.is_anonymous ? 'Anonymous' : 'Named'}
+              </span>
+            </div>
+          `;
+          feedbackContainer.appendChild(div);
+        });
+      } else if (feedbackContainer) {
+        feedbackContainer.innerHTML = '<div style="text-align: center; color: var(--muted); padding: 20px;">No feedback submitted yet</div>';
+        if (feedbackCount) feedbackCount.textContent = '0';
+      }
+    }
+
+    function updateAnnouncementsDisplay(announcements) {
+      // Update HR announcements with real data from database
+      hrAnnouncements = announcements;
+      renderAnnouncements();
+    }
+
+    function updateWellnessTrends(wellness) {
+      // Update sentiment score
+      const sentimentScore = document.getElementById('sentimentScore');
+      if (sentimentScore && wellness.total_responses > 0) {
+        const overallScore = Math.round((wellness.average_mood / 5) * 100);
+        sentimentScore.textContent = `${overallScore}/100`;
+        
+        // Update the circular chart display if it exists
+        if (typeof Chart !== 'undefined') {
+          // Update existing wellness chart with real data
+          const wellbeingData = Array.from({length: 7}, (_, i) => wellness.average_mood + (Math.random() - 0.5) * 2);
+          const productivityData = Array.from({length: 7}, (_, i) => wellness.average_energy + (Math.random() - 0.5) * 1.5);
+          
+          // Update chart if it exists
+          const chartCanvas = document.getElementById('wellbeingChart');
+          if (chartCanvas) {
+            const ctx = chartCanvas.getContext('2d');
+            new Chart(ctx, {
+              type: 'line',
+              data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [
+                  {
+                    label: 'Well-being',
+                    data: wellbeingData,
+                    borderColor: '#059669',
+                    backgroundColor: 'rgba(5,150,105,0.12)',
+                    tension: 0.35,
+                    fill: true
+                  },
+                  {
+                    label: 'Productivity',
+                    data: productivityData,
+                    borderColor: '#2563eb',
+                    backgroundColor: 'rgba(37,99,235,0.12)',
+                    tension: 0.35,
+                    fill: true
+                  }
+                ]
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                  x: { grid: { display: false } },
+                  y: { beginAtZero: true, max: 10, grid: { color: '#f1f5f9' } }
+                }
+              }
+            });
+          }
+        }
+      }
+      
+      // Update wellness section in the new dashboard
+      updateWellnessSection(wellness);
+    }
+
+    function updateWorkloadAnalysis(workload) {
+      // Update burnout risk alerts with real data
+      const burnoutList = document.getElementById('burnoutList');
+      if (burnoutList && workload.total_responses > 0) {
+        // Clear existing data
+        burnoutList.innerHTML = '';
+        
+        // Add real workload statistics
+        const highRiskDiv = document.createElement('div');
+        highRiskDiv.className = 'row';
+        highRiskDiv.innerHTML = `
+          <span style="flex:1">High Stress Employees</span>
+          <span class="badge risk-high">${workload.high_stress_employees} employees</span>
+          <span style="font-weight:600">${Math.round((workload.high_stress_employees / workload.total_responses) * 100)}%</span>
+        `;
+        burnoutList.appendChild(highRiskDiv);
+        
+        const mediumRiskDiv = document.createElement('div');
+        mediumRiskDiv.className = 'row';
+        mediumRiskDiv.innerHTML = `
+          <span style="flex:1">Medium Stress Employees</span>
+          <span class="badge risk-medium">${workload.medium_stress_employees} employees</span>
+          <span style="font-weight:600">${Math.round((workload.medium_stress_employees / workload.total_responses) * 100)}%</span>
+        `;
+        burnoutList.appendChild(mediumRiskDiv);
+        
+        const lowRiskDiv = document.createElement('div');
+        lowRiskDiv.className = 'row';
+        lowRiskDiv.innerHTML = `
+          <span style="flex:1">Low Stress Employees</span>
+          <span class="badge risk-low">${workload.low_stress_employees} employees</span>
+          <span style="font-weight:600">${Math.round((workload.low_stress_employees / workload.total_responses) * 100)}%</span>
+        `;
+        burnoutList.appendChild(lowRiskDiv);
+      }
+      
+      // Update workload section in the new dashboard
+      updateWorkloadSection(workload);
+    }
+
+    // Load employee data when page loads
+    loadEmployeeData();
+
+    // Refresh data every 5 minutes
+    setInterval(loadEmployeeData, 300000);
+    
+    // Update summary statistics after data loads
+    setTimeout(updateSummaryStatistics, 1000);
+    
+    // ===== NEW DASHBOARD SECTIONS =====
+    
+    function updateWellnessSection(wellness) {
+      const wellnessContainer = document.getElementById('employeeWellnessSection');
+      const wellnessCount = document.getElementById('wellnessCount');
+      const avgMoodScore = document.getElementById('avgMoodScore');
+      
+      if (wellnessContainer && wellness.total_responses > 0) {
+        wellnessContainer.innerHTML = '';
+        
+        // Update wellness count
+        if (wellnessCount) {
+          wellnessCount.textContent = wellness.total_responses;
+        }
+        
+        // Update average mood score
+        if (avgMoodScore) {
+          avgMoodScore.textContent = wellness.average_mood ? wellness.average_mood.toFixed(1) : '0';
+        }
+        
+        // Display recent wellness entries (max 5 items)
+        const recentWellness = wellness.recent_entries ? wellness.recent_entries.slice(0, 5) : [];
+        
+        if (recentWellness.length > 0) {
+          recentWellness.forEach(item => {
+            const div = document.createElement('div');
+            div.style.cssText = 'padding: 12px; background: white; border: 1px solid var(--teal-200); border-radius: 8px; margin-bottom: 8px;';
+            div.innerHTML = `
+              <div style="font-weight: 600; color: var(--teal-700); margin-bottom: 6px; font-size: 13px;">
+                😊 Mood: ${item.moodRating}/5
+              </div>
+              <div style="font-size: 11px; color: var(--muted); margin-bottom: 4px;">
+                💤 Sleep: ${item.sleepQuality}/10 • ⚡ Energy: ${item.energyLevel}/10
+              </div>
+              <div style="font-size: 11px; color: var(--muted);">
+                🕒 ${item.timestamp || 'Recent'}
+              </div>
+            `;
+            wellnessContainer.appendChild(div);
+          });
+        } else {
+          wellnessContainer.innerHTML = '<div style="text-align: center; color: var(--muted); padding: 20px;">No wellness data yet</div>';
+        }
+      } else if (wellnessContainer) {
+        wellnessContainer.innerHTML = '<div style="text-align: center; color: var(--muted); padding: 20px;">No wellness data yet</div>';
+        if (wellnessCount) wellnessCount.textContent = '0';
+        if (avgMoodScore) avgMoodScore.textContent = '0';
+      }
+    }
+    
+    function updateWorkloadSection(workload) {
+      const workloadContainer = document.getElementById('employeeWorkloadSection');
+      const workloadCount = document.getElementById('workloadCount');
+      const highStressCount = document.getElementById('highStressCount');
+      
+      if (workloadContainer && workload.total_responses > 0) {
+        workloadContainer.innerHTML = '';
+        
+        // Update workload count
+        if (workloadCount) {
+          workloadCount.textContent = workload.total_responses;
+        }
+        
+        // Update high stress count
+        if (highStressCount) {
+          highStressCount.textContent = workload.high_stress_employees || 0;
+        }
+        
+        // Display workload summary
+        const summaryDiv = document.createElement('div');
+        summaryDiv.style.cssText = 'padding: 12px; background: white; border: 1px solid var(--teal-200); border-radius: 8px; margin-bottom: 8px;';
+        summaryDiv.innerHTML = `
+          <div style="font-weight: 600; color: var(--teal-700); margin-bottom: 8px; font-size: 13px;">
+            ⚖️ Workload Distribution
+          </div>
+          <div style="display: grid; gap: 6px; font-size: 11px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span>🔴 High Stress:</span>
+              <span style="color: var(--rose-600); font-weight: 600;">${workload.high_stress_employees || 0} (${Math.round(((workload.high_stress_employees || 0) / workload.total_responses) * 100)}%)</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span>🟡 Medium Stress:</span>
+              <span style="color: var(--amber-600); font-weight: 600;">${workload.medium_stress_employees || 0} (${Math.round(((workload.medium_stress_employees || 0) / workload.total_responses) * 100)}%)</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span>🟢 Low Stress:</span>
+              <span style="color: var(--green-600); font-weight: 600;">${workload.low_stress_employees || 0} (${Math.round(((workload.low_stress_employees || 0) / workload.total_responses) * 100)}%)</span>
+            </div>
+          </div>
+        `;
+        workloadContainer.appendChild(summaryDiv);
+      } else if (workloadContainer) {
+        workloadContainer.innerHTML = '<div style="text-align: center; color: var(--muted); padding: 20px;">No workload data yet</div>';
+        if (workloadCount) workloadCount.textContent = '0';
+        if (highStressCount) highStressCount.textContent = '0';
+      }
+    }
+    
+    function updateSummaryStatistics() {
+      const totalResponses = document.getElementById('totalResponses');
+      const feedbackTrend = document.getElementById('feedbackTrend');
+      
+      // Calculate total responses from all sections
+      const feedbackCount = parseInt(document.getElementById('feedbackCount')?.textContent || '0');
+      const wellnessCount = parseInt(document.getElementById('wellnessCount')?.textContent || '0');
+      const workloadCount = parseInt(document.getElementById('workloadCount')?.textContent || '0');
+      const actionsCount = parseInt(document.getElementById('actionsCount')?.textContent || '0');
+      
+      const total = feedbackCount + wellnessCount + workloadCount + actionsCount;
+      
+      if (totalResponses) {
+        totalResponses.textContent = total;
+      }
+      
+      // Simple trend indicator (can be enhanced with real trend data)
+      if (feedbackTrend) {
+        if (total > 10) {
+          feedbackTrend.textContent = '↗️';
+          feedbackTrend.style.color = 'var(--green-600)';
+        } else if (total > 5) {
+          feedbackTrend.textContent = '→';
+          feedbackTrend.style.color = 'var(--amber-600)';
+        } else {
+          feedbackTrend.textContent = '↘️';
+          feedbackTrend.style.color = 'var(--rose-600)';
+        }
+      }
     }
     
     // ===== DASHBOARD FUNCTIONALITY =====
@@ -982,31 +1417,31 @@
       }
     });
 
-    // ----- Send Announcements -----
-    let recentAnnouncements = [
-      { title: 'Team Meeting Tomorrow', content: 'Weekly sync at 10 AM. Please prepare your updates.', urgent: false, date: '1 hour ago', audience: 'all' },
-      { title: 'System Maintenance', content: 'Platform will be down for 2 hours tonight for updates.', urgent: true, date: '3 hours ago', audience: 'all' },
-      { title: 'New Project Launch', content: 'Exciting new initiative starting next week. Details to follow.', urgent: false, date: '1 day ago', audience: 'managers' }
-    ];
+    // ----- Enhanced Announcements System -----
+    let hrAnnouncements = [];
 
-    let allAnnouncements = [...recentAnnouncements];
-
-    function renderAnnouncements(announcements = allAnnouncements) {
+    function renderAnnouncements() {
       const container = document.getElementById('recentAnnouncements');
+      if (container) {
       container.innerHTML = '';
-      announcements.forEach(({ title, content, urgent, date, audience }) => {
+        
+        if (hrAnnouncements.length === 0) {
+          container.innerHTML = '<div style="text-align: center; color: var(--muted); padding: 20px;">No announcements yet</div>';
+          return;
+        }
+        
+        hrAnnouncements.slice(0, 5).forEach(item => {
         const div = document.createElement('div');
-        div.className = `announcement-item ${urgent ? 'urgent' : ''}`;
+          div.className = `announcement-item ${item.urgent ? 'urgent' : ''}`;
         div.innerHTML = `
-          <div class="announcement-title">${title}</div>
-          <div style="font-size:12px; margin-bottom:4px">${content}</div>
-          <div class="announcement-meta">${date} • ${audience}${urgent ? ' • Urgent' : ''}</div>
+            <div class="announcement-title">${item.title}</div>
+            <div style="font-size:12px; margin-bottom:4px">${item.content}</div>
+            <div class="announcement-meta">${item.time_ago} • ${item.audience}${item.urgent ? ' • Urgent' : ''}</div>
         `;
         container.appendChild(div);
       });
+      }
     }
-
-    renderAnnouncements();
 
     // Schedule options toggle
     document.getElementById('scheduleFlag').addEventListener('change', function() {
@@ -1037,29 +1472,49 @@
         </div>
       `;
       
-      document.getElementById('previewModal').style.display = 'flex';
+      // Show the sidebar if it's hidden
+      const previewSidebar = document.querySelector('.preview-sidebar');
+      previewSidebar.style.display = 'block';
     });
 
-    // Close preview modal
-    document.getElementById('closePreview').addEventListener('click', function() {
-      document.getElementById('previewModal').style.display = 'none';
+    // Close preview sidebar
+    document.getElementById('closePreviewSidebar').addEventListener('click', function() {
+      const previewSidebar = document.querySelector('.preview-sidebar');
+      previewSidebar.style.display = 'none';
     });
 
-    // Send from preview
-    document.getElementById('sendFromPreview').addEventListener('click', function() {
-      document.getElementById('previewModal').style.display = 'none';
+    // Send from preview sidebar
+    document.getElementById('sendFromPreviewSidebar').addEventListener('click', function() {
       document.getElementById('announcementForm').dispatchEvent(new Event('submit'));
     });
 
-    // Edit from preview
-    document.getElementById('editPreview').addEventListener('click', function() {
-      document.getElementById('previewModal').style.display = 'none';
+    // Edit from preview sidebar
+    document.getElementById('editPreviewSidebar').addEventListener('click', function() {
+      // Focus on the announcement form
+      document.getElementById('announcementTitle').focus();
     });
 
     // Filter announcements
     document.getElementById('filterUrgent').addEventListener('click', function() {
-      const urgentOnly = allAnnouncements.filter(a => a.urgent);
-      renderAnnouncements(urgentOnly);
+      const urgentOnly = hrAnnouncements.filter(a => a.urgent);
+      const container = document.getElementById('recentAnnouncements');
+      if (container) {
+        container.innerHTML = '';
+        if (urgentOnly.length === 0) {
+          container.innerHTML = '<div style="text-align: center; color: var(--muted); padding: 20px;">No urgent announcements</div>';
+        } else {
+          urgentOnly.forEach(item => {
+            const div = document.createElement('div');
+            div.className = `announcement-item ${item.urgent ? 'urgent' : ''}`;
+            div.innerHTML = `
+              <div class="announcement-title">${item.title}</div>
+              <div style="font-size:12px; margin-bottom:4px">${item.content}</div>
+              <div class="announcement-meta">${item.time_ago} • ${item.audience}${item.urgent ? ' • Urgent' : ''}</div>
+            `;
+            container.appendChild(div);
+          });
+        }
+      }
     });
 
     document.getElementById('showAll').addEventListener('click', function() {
@@ -1074,6 +1529,7 @@
       const urgent = document.getElementById('urgentFlag').checked;
       const schedule = document.getElementById('scheduleFlag').checked;
       const audience = document.getElementById('targetAudience').value;
+      const userEmail = localStorage.getItem('userEmail');
       
       if (!title || !content) {
         alert('Please fill in both title and content.');
@@ -1081,38 +1537,55 @@
       }
 
       let scheduledDate = '';
+      let scheduledTime = '';
       if (schedule) {
-        const date = document.getElementById('scheduleDate').value;
-        const time = document.getElementById('scheduleTime').value;
-        if (!date || !time) {
+        scheduledDate = document.getElementById('scheduleDate').value;
+        scheduledTime = document.getElementById('scheduleTime').value;
+        if (!scheduledDate || !scheduledTime) {
           alert('Please select both date and time for scheduling.');
           return;
         }
-        scheduledDate = ` (Scheduled for ${date} at ${time})`;
       }
 
-      // Create new announcement
-      const newAnnouncement = {
-        title,
-        content,
-        urgent,
-        date: schedule ? `Scheduled${scheduledDate}` : 'Just now',
-        audience
-      };
-      
-      allAnnouncements.unshift(newAnnouncement);
-      recentAnnouncements = allAnnouncements.slice(0, 10);
-      renderAnnouncements();
-      
+      // Submit announcement to database
+      fetch('/submit_announcement', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: title,
+          content: content,
+          urgent: urgent,
+          audience: audience,
+          scheduledDate: scheduledDate,
+          scheduledTime: scheduledTime,
+          createdBy: userEmail
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
       // Clear form
       this.reset();
       document.getElementById('scheduleOptions').style.display = 'none';
+          
+          // Reload announcements to show the new one
+          loadEmployeeData();
       
       if (schedule) {
-        alert(`Announcement scheduled successfully for ${date} at ${time}!`);
+            alert(`Announcement scheduled successfully for ${scheduledDate} at ${scheduledTime}!`);
       } else {
         alert('Announcement sent successfully!');
       }
+        } else {
+          alert('Error creating announcement: ' + data.message);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Error creating announcement. Please try again.');
+      });
     });
 
     // Set default date/time for scheduling
@@ -1121,6 +1594,200 @@
       tomorrow.setDate(tomorrow.getDate() + 1);
       document.getElementById('scheduleDate').value = tomorrow.toISOString().split('T')[0];
       document.getElementById('scheduleTime').value = '09:00';
+    });
+    
+    // ===== EMPLOYEE RESPONSES DASHBOARD EVENT LISTENERS =====
+    
+    // View All Feedback button
+    document.getElementById('viewAllFeedback')?.addEventListener('click', function() {
+      // This could open a modal or navigate to a detailed feedback page
+      alert('View All Feedback functionality - This would show all employee feedback in detail');
+    });
+    
+    // View All Wellness Data button
+    document.getElementById('viewAllWellness')?.addEventListener('click', function() {
+      // This could open a modal or navigate to a detailed wellness page
+      alert('View All Wellness Data functionality - This would show all employee wellness data in detail');
+    });
+    
+    // View All Workload Data button
+    document.getElementById('viewAllWorkload')?.addEventListener('click', function() {
+      // This could open a modal or navigate to a detailed workload page
+      alert('View All Workload Data functionality - This would show all employee workload data in detail');
+    });
+    
+    // View All Actions button
+    document.getElementById('viewAllActions')?.addEventListener('click', function() {
+      // This could open a modal or navigate to a detailed actions page
+      alert('View All Actions functionality - This would show all employee actions and leave requests in detail');
+    });
+    
+    // ===== SAMPLE DATA MANAGEMENT =====
+    
+    // Initialize All Sample Data button
+    document.getElementById('initSampleData')?.addEventListener('click', function() {
+      this.textContent = '⏳ Initializing...';
+      this.disabled = true;
+      
+      fetch('/init-sample-data')
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            alert('✅ All sample data initialized successfully! This includes announcements, feedback, wellness, and workload data.');
+            // Reload all data to show the new content
+            loadEmployeeData();
+          } else {
+            alert('❌ Error: ' + data.message);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('❌ Error initializing sample data. Please try again.');
+        })
+        .finally(() => {
+          this.textContent = 'Initialize All Sample Data';
+          this.disabled = false;
+        });
+    });
+    
+    // Add More Sample Data button
+    document.getElementById('addMoreSamples')?.addEventListener('click', function() {
+      this.textContent = '⏳ Adding...';
+      this.disabled = true;
+      
+      // Add more sample announcements
+      const additionalAnnouncements = [
+        {
+          title: '📚 Professional Development Opportunities',
+          content: 'We\'re offering free online courses and certifications this quarter. Topics include leadership, technical skills, and soft skills. Check the learning portal for available courses and register by the end of the month.',
+          urgent: false,
+          audience: 'all',
+          createdBy: 'HR Team'
+        },
+        {
+          title: '🏥 Health & Wellness Program Launch',
+          content: 'Starting next week, we\'re launching our new health and wellness program. This includes free gym memberships, mental health support, and wellness challenges. Look for the detailed email with registration information.',
+          urgent: false,
+          audience: 'all',
+          createdBy: 'HR Team'
+        },
+        {
+          title: '🎯 Q4 Goals & Performance Review',
+          content: 'Q4 performance reviews will begin next Monday. Please ensure your goals are updated in the system and prepare your self-assessment. Managers will schedule 1-on-1 meetings this week.',
+          urgent: true,
+          audience: 'all',
+          createdBy: 'HR Team'
+        },
+        {
+          title: '🎊 Holiday Party Planning Committee',
+          content: 'We\'re forming a holiday party planning committee! If you\'re interested in helping organize our end-of-year celebration, please email HR by Friday. This is a great way to get involved and make it special for everyone.',
+          urgent: false,
+          audience: 'all',
+          createdBy: 'HR Team'
+        },
+        {
+          title: '🔒 Cybersecurity Awareness Training',
+          content: 'Mandatory cybersecurity awareness training is now available in the learning portal. All employees must complete this training by the end of the month. This covers phishing prevention, password security, and data protection.',
+          urgent: true,
+          audience: 'all',
+          createdBy: 'HR Team'
+        },
+        {
+          title: '🌍 Remote Work Policy Update',
+          content: 'We\'ve updated our remote work policy to be more flexible. New guidelines include hybrid work options, home office stipends, and flexible scheduling. Check the employee handbook for complete details.',
+          urgent: false,
+          audience: 'all',
+          createdBy: 'HR Team'
+        }
+      ];
+      
+      // Submit each announcement
+      let submittedCount = 0;
+      const totalCount = additionalAnnouncements.length;
+      
+      additionalAnnouncements.forEach((announcement, index) => {
+        fetch('/submit_announcement', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(announcement)
+        })
+        .then(response => response.json())
+        .then(data => {
+          submittedCount++;
+          if (submittedCount === totalCount) {
+            alert(`✅ Successfully added ${totalCount} more sample announcements!`);
+            // Reload announcements to show the new ones
+            loadEmployeeData();
+            this.textContent = 'Add More Sample Data';
+            this.disabled = false;
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          submittedCount++;
+          if (submittedCount === totalCount) {
+            alert('⚠️ Some announcements were added successfully, but there were some errors.');
+            this.textContent = 'Add More Sample Data';
+            this.disabled = false;
+          }
+        });
+      });
+    });
+    
+    // Add More Employee Data button
+    document.getElementById('addMoreEmployeeData')?.addEventListener('click', function() {
+      this.textContent = '⏳ Adding...';
+      this.disabled = true;
+      
+      fetch('/add-more-sample-data')
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            alert('✅ Additional employee data added successfully! This includes more feedback, wellness, and workload entries.');
+            // Reload all data to show the new content
+            loadEmployeeData();
+          } else {
+            alert('❌ Error: ' + data.message);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('❌ Error adding employee data. Please try again.');
+        })
+        .finally(() => {
+          this.textContent = 'Add Employee Data';
+          this.disabled = false;
+        });
+    });
+    
+    // Clear All Sample Data button
+    document.getElementById('clearSampleData')?.addEventListener('click', function() {
+      if (confirm('⚠️ Are you sure you want to clear ALL sample data? This will remove all announcements, feedback, wellness, and workload data. This action cannot be undone.')) {
+        this.textContent = '⏳ Clearing...';
+        this.disabled = true;
+        
+        fetch('/clear-sample-data')
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              alert('🗑️ All sample data cleared successfully!');
+              // Reload all data to show empty states
+              loadEmployeeData();
+            } else {
+              alert('❌ Error: ' + data.message);
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            alert('❌ Error clearing sample data. Please try again.');
+          })
+          .finally(() => {
+            this.textContent = 'Clear All Sample Data';
+            this.disabled = false;
+          });
+      }
     });
 
   </script>

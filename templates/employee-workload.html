@@ -244,17 +244,7 @@
 
     <!-- Main Content -->
     <main>
-      <!-- Header with User Info -->
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding: 16px; background: var(--card); border-radius: 12px; border: 1px solid var(--line);">
-        <div>
-          <div style="font-size: 14px; color: var(--muted); margin-bottom: 4px;">Welcome back</div>
-          <div style="font-size: 18px; font-weight: 600; color: var(--teal-600);" id="userName">Sarah</div>
-        </div>
-        <div style="display: flex; align-items: center; gap: 12px;">
-          <div style="font-size: 14px; color: var(--muted);" id="userEmail">sarah@company.com</div>
-          <button class="btn btn-secondary" id="logoutBtn" style="padding: 8px 16px; font-size: 12px;">Logout</button>
-        </div>
-      </div>
+
 
       <!-- Header -->
       <div class="header">
@@ -324,13 +314,7 @@
       return true;
     }
     
-    // Logout functionality
-    document.getElementById('logoutBtn').addEventListener('click', function() {
-      localStorage.removeItem('isLoggedIn');
-      localStorage.removeItem('userRole');
-      localStorage.removeItem('userEmail');
-      window.location.href = '/redirect';
-    });
+
     
     // Sidebar logout functionality
     document.getElementById('sidebarLogoutBtn').addEventListener('click', function() {
@@ -376,14 +360,38 @@
     document.getElementById('submitWorkload').addEventListener('click', function() {
       const workload = workloadSlider.value;
       const comments = document.getElementById('workloadComments').value;
+      const userEmail = localStorage.getItem('userEmail');
       
+      // Submit workload data to the server
+      fetch('/submit_workload', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          stressLevel: parseInt(workload),
+          workloadRating: parseInt(workload),
+          workHours: 8, // Default for now
+          taskCompletion: 80, // Default for now
+          comments: comments,
+          userEmail: userEmail
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
       document.getElementById('workloadSubmitted').style.display = 'block';
       this.textContent = 'Assessment Submitted';
       this.disabled = true;
       this.style.background = 'var(--green-600)';
-      
-      // In a real app, this would send data to the server
-      console.log('Workload assessment submitted:', { workload, comments });
+        } else {
+          alert('Error submitting workload assessment: ' + data.message);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Error submitting workload assessment. Please try again.');
+      });
     });
   </script>
 </body>

@@ -244,17 +244,7 @@
 
     <!-- Main Content -->
     <main>
-      <!-- Header with User Info -->
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding: 16px; background: var(--card); border-radius: 12px; border: 1px solid var(--line);">
-        <div>
-          <div style="font-size: 14px; color: var(--muted); margin-bottom: 4px;">Welcome back</div>
-          <div style="font-size: 18px; font-weight: 600; color: var(--teal-600);" id="userName">Sarah</div>
-        </div>
-        <div style="display: flex; align-items: center; gap: 12px;">
-          <div style="font-size: 14px; color: var(--muted);" id="userEmail">sarah@company.com</div>
-          <button class="btn btn-secondary" id="logoutBtn" style="padding: 8px 16px; font-size: 12px;">Logout</button>
-        </div>
-      </div>
+
 
       <!-- Header -->
       <div class="header">
@@ -338,13 +328,7 @@
       return true;
     }
     
-    // Logout functionality
-    document.getElementById('logoutBtn').addEventListener('click', function() {
-      localStorage.removeItem('isLoggedIn');
-      localStorage.removeItem('userRole');
-      localStorage.removeItem('userEmail');
-      window.location.href = '/redirect';
-    });
+
     
     // Sidebar logout functionality
     document.getElementById('sidebarLogoutBtn').addEventListener('click', function() {
@@ -386,17 +370,39 @@
       const category = document.getElementById('feedbackCategory').value;
       const content = document.getElementById('feedbackContent').value;
       const isAnonymous = document.getElementById('feedbackAnonymous').checked;
+      const userEmail = localStorage.getItem('userEmail');
       
       if (!category || !content.trim()) {
         alert('Please select a category and provide feedback content.');
         return;
       }
       
-      document.getElementById('feedbackSubmitted').style.display = 'block';
-      this.style.display = 'none';
-      
-      // In a real app, this would send data to the server
-      console.log('Feedback submitted:', { category, content, isAnonymous });
+      // Submit feedback to the server
+      fetch('/submit_feedback', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          category: category,
+          content: content,
+          isAnonymous: isAnonymous,
+          userEmail: isAnonymous ? null : userEmail
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          document.getElementById('feedbackSubmitted').style.display = 'block';
+          this.style.display = 'none';
+        } else {
+          alert('Error submitting feedback: ' + data.message);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Error submitting feedback. Please try again.');
+      });
     });
   </script>
 </body>
